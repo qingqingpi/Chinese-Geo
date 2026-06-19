@@ -69,10 +69,11 @@ Claude Code 一键装成插件（含 5 个技能 + MCP），以及 Codex / Curso
 - [x] Bytespider 服务端硬拦探测（robots 挡了≠真挡住）+ 反向 DNS 真伪校验（`bots verify`）
 - [x] CLI `init` + `llms gen`：一键生成 robots + llms.txt + schema 脚手架 + canonical 自查清单
 - [ ] 行动清单：预期效果（量化）+ 影响哪些引擎 + 怎么验证
-- [x] 5 个 Agent Skill（vendor-neutral，跑在 Claude Code / Codex / CodeBuddy / Qoder / Kimi 等）：audit 体检 / structure 结构 / content 文案 / offsite 站外+实体 / monitor 引用率·SoV
+- [x] 6 个 Agent Skill（vendor-neutral，跑在 Claude Code / Codex / CodeBuddy / Qoder / Kimi 等）：**optimize 全流程总入口** / audit 体检 / structure 结构 / content 文案 / offsite 站外+实体 / monitor 引用率·SoV
 - [x] 跨 Agent 指令层（`AGENTS.md` + `CLAUDE.md`，覆盖 Codex / opencode / Cursor / Trae / Kimi 等 30+ agent）
 - [x] MCP server（7 工具：audit / bots_gen / schema_gen / llms_gen / monitor_prompts / monitor_run / monitor_score；可选 `pip install china-geo[mcp]`，跑 `seogeo-mcp`）
 - [x] Claude 插件一键装（`.claude-plugin/` plugin.json + marketplace + 根 `.mcp.json`）→ 见 [INSTALL.md](INSTALL.md)
+- [x] 跨 agent 一键接入：`seogeo init --agent <claude|codex|gemini|cursor|generic>`（写指令文件 + `.mcp.json`，不覆盖已有）
 - [x] 引用率 / SoV 监控（零 key 手动抽样，中文友好，真 SoV）：`seogeo monitor` + seogeo-monitor Skill
 - [x] 站外矩阵 + 实体权威层（知乎 / CSDN / 公众号 / 小红书…）→ `seogeo-offsite` skill
 - [x] BYOK 监控自动跑引擎（自带 key 一条命令跑完各引擎）：`seogeo monitor run`

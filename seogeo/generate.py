@@ -142,12 +142,56 @@ def build_init_bundle(site_title: str = "<站点名>", sitemap_url: str | None =
     }
 
 
+_AGENT_MCP_JSON = json.dumps(
+    {"mcpServers": {"seogeo": {"command": "seogeo-mcp", "args": []}}},
+    ensure_ascii=False, indent=2,
+) + "\n"
+
+# 各 agent 的指令文件落点（事实标准 / 各家约定）
+_AGENT_INSTRUCTION_FILE = {
+    "claude": "CLAUDE.md",
+    "codex": "AGENTS.md",
+    "gemini": "GEMINI.md",
+    "cursor": ".cursor/rules/seogeo.mdc",
+    "generic": "AGENTS.md",
+}
+
+_AGENT_BLURB = """\
+# seogeo —— AI 可见性 / GEO 优化工具（本项目已接入）
+
+让网站被国内（豆包 / DeepSeek / 文心 / 通义 / 元宝 / Kimi）与海外（ChatGPT / Claude /
+Perplexity / Google AI）AI 引擎抓取与引用。做 AI 可见性 / GEO / SEO 时用下面的命令与技能。
+
+## CLI（确定性、零依赖；未装命令时用 `python -m seogeo.cli ...`）
+- `seogeo audit <url> [--format md|json]` —— 7 维度 AI 可见性体检。
+- `seogeo bots gen` / `bots verify <ip> <bot>` —— robots（国内各家单独成块）/ 反向 DNS 校验。
+- `seogeo schema gen <type>` ｜ `llms gen` ｜ `init` —— JSON-LD / llms.txt / 一键打包产物。
+- `seogeo monitor prompts｜run｜score` —— 引用率 / SoV（零 key 手动 + BYOK 自动）。
+
+## 关键 know-how
+- 国内爬虫各家须单独成块（合并进 `*` 会被忽略）；Bytespider 不守 robots，要服务端硬拦。
+- 每家 AI 主要"吃自己生态"：豆包←抖音/头条、元宝←公众号、文心←百度百科/百家号、DeepSeek/Kimi←知乎/CSDN。
+- llms.txt 国内基本无效；GEO 主战场是联网检索。
+
+## 技能（装了 Claude 插件或克隆了仓库时可用）
+optimize（全流程总入口）/ audit / structure / content / offsite / monitor。
+"""
+
+
+def build_agent_bundle(agent: str) -> dict:
+    """生成某 agent 的接入文件包：指令文件 + .mcp.json（写进用户项目，让该 agent 认得 seogeo）。"""
+    key = agent.lower()
+    if key not in _AGENT_INSTRUCTION_FILE:
+        raise ValueError(f"未知 agent：{agent}（支持：{', '.join(_AGENT_INSTRUCTION_FILE)}）")
+    return {_AGENT_INSTRUCTION_FILE[key]: _AGENT_BLURB, ".mcp.json": _AGENT_MCP_JSON}
+
+
 def write_bundle(bundle: dict, output_dir: str) -> list:
-    """把产物包写到 output_dir（不存在则创建），返回写入的文件路径列表。"""
-    os.makedirs(output_dir, exist_ok=True)
+    """把产物包写到 output_dir（含嵌套路径，按需逐层建目录），返回写入的文件路径列表。"""
     written = []
     for name, content in bundle.items():
         path = os.path.join(output_dir, name)
+        os.makedirs(os.path.dirname(path) or ".", exist_ok=True)
         with open(path, "w", encoding="utf-8") as f:
             f.write(content)
         written.append(path)

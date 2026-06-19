@@ -11,13 +11,14 @@
 - `seogeo bots verify <ip> <bot>` —— 反向 DNS 校验爬虫 IP 真伪。
 - `seogeo schema gen <type>` —— JSON-LD 脚手架（organization / article / faqpage / breadcrumb）。
 - `seogeo llms gen [--title <X>] [--summary <Y>]` —— llms.txt 脚手架（主要面向海外引擎；国内基本不读）。
-- `seogeo init [--site <X>] [--sitemap <url>] [--output <dir>]` —— 一键打包 robots + llms.txt + schema + canonical 清单到目录。
+- `seogeo init [--site <X>] [--sitemap <url>]` —— 站点产物（robots + llms.txt + schema + canonical 清单）；`seogeo init --agent <claude|codex|gemini|cursor|generic>` —— 把 seogeo 接入某 agent（写指令文件 + .mcp.json，不覆盖已有）。
 - `seogeo monitor prompts --industry <X>` ｜ `monitor score --answers <f.json> --brand <X>`（零 key 手动）｜ `monitor run --industry <X> --brand <X>`（BYOK 自带 key 自动跑各引擎）—— 引用率 / SoV。
 
 未安装命令时用 `python -m seogeo.cli ...`（设 `PYTHONPATH=.`）。
 
 ## Skills（判断层，跑在 Agent 里）
-- `skills/seogeo-audit/SKILL.md` —— AI 可见性体检 / 优化总入口：调 `audit` → 出中文行动清单，再按问题转交下面专项 skill。
+- `skills/seogeo-optimize/SKILL.md` —— **全流程总入口**：用户要"从头到尾完整做一遍 GEO / AI 可见性优化"时，按六阶段编排，逐段委派下面的专项 skill。
+- `skills/seogeo-audit/SKILL.md` —— AI 可见性体检：调 `audit` → 出中文行动清单。
 - `skills/seogeo-structure/SKILL.md` —— 页面结构 / 骨架（答案胶囊、FAQ、表格、schema 对齐）：调 `audit` / `schema`。
 - `skills/seogeo-content/SKILL.md` —— 文案改写成可引用形态（结论前置、加数据 / 引文）：几乎纯判断。
 - `skills/seogeo-offsite/SKILL.md` —— 站外平台矩阵 + 实体权威层（知乎 / CSDN / 公众号 / 百度百科、sameAs / NAP）。

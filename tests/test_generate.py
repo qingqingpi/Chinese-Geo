@@ -6,6 +6,7 @@
 import pytest
 
 from seogeo.generate import (
+    build_agent_bundle,
     build_init_bundle,
     generate_llms,
     generate_robots,
@@ -139,3 +140,37 @@ def test_write_bundle_creates_dir_and_files(tmp_path):
     assert (tmp_path / "out" / "robots.txt").read_text(encoding="utf-8") == "X"
     assert (tmp_path / "out" / "llms.txt").read_text(encoding="utf-8") == "Y"
     assert len(paths) == 2
+
+
+def test_write_bundle_creates_nested_dirs(tmp_path):
+    write_bundle({".cursor/rules/x.mdc": "Y"}, str(tmp_path / "p"))
+    assert (tmp_path / "p" / ".cursor" / "rules" / "x.mdc").read_text(encoding="utf-8") == "Y"
+
+
+# ---- agent 安装包（init --agent）----
+
+def test_agent_bundle_claude_has_instruction_and_mcp():
+    b = build_agent_bundle("claude")
+    assert "CLAUDE.md" in b and ".mcp.json" in b
+    assert "seogeo audit" in b["CLAUDE.md"]
+
+
+def test_agent_bundle_cursor_uses_nested_rules_path():
+    assert ".cursor/rules/seogeo.mdc" in build_agent_bundle("cursor")
+
+
+def test_agent_bundle_mcp_is_valid_json_with_server():
+    import json
+    mcp = json.loads(build_agent_bundle("gemini")[".mcp.json"])
+    assert "seogeo" in mcp["mcpServers"]
+
+
+def test_agent_bundle_instruction_is_neutral_terminology():
+    blurb = build_agent_bundle("claude")["CLAUDE.md"]
+    assert chr(0x4e2d) + chr(0x56fd) not in blurb  # 不含地缘国名词
+    assert chr(0x897f) + chr(0x65b9) not in blurb  # 不含地缘方位词
+
+
+def test_agent_bundle_unknown_raises():
+    with pytest.raises(ValueError):
+        build_agent_bundle("nonsense")

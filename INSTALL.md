@@ -37,6 +37,8 @@ cd china-geo && pip install -e .
 - **支持 Agent Skills 的**（Codex / CodeBuddy / Kimi 等）：`skills/*/SKILL.md` 是 vendor-neutral 纯 Markdown，放进该 agent 的 skills 目录即可。
 - **都不支持的**（如 Cursor）：直接 `seogeo <命令>` 命令行也能拿到约 80% 价值。
 
+> **懒人快捷**：在你的项目根跑 `seogeo init --agent <claude|codex|gemini|cursor|generic>`，自动写好该 agent 的指令文件（`CLAUDE.md` / `AGENTS.md` / `GEMINI.md` / `.cursor/rules/seogeo.mdc`）+ `.mcp.json`；已存在的文件不会被覆盖。
+
 ## 分层一览
 
 | 层 | 产物 | 覆盖 |

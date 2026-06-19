@@ -17,10 +17,10 @@ def _read(path):
         return f.read()
 
 
-def test_all_five_skills_present():
+def test_all_skills_present():
     names = {os.path.basename(os.path.dirname(p)) for p in _SKILLS}
-    assert {"seogeo-audit", "seogeo-monitor", "seogeo-structure",
-            "seogeo-content", "seogeo-offsite"} <= names
+    assert {"seogeo-optimize", "seogeo-audit", "seogeo-structure",
+            "seogeo-content", "seogeo-offsite", "seogeo-monitor"} <= names
 
 
 @pytest.mark.parametrize("path", _SKILLS, ids=lambda p: os.path.basename(os.path.dirname(p)))

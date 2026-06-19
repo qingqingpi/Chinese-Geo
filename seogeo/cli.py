@@ -5,7 +5,8 @@
   seogeo bots verify <ip> <bot>
   seogeo schema gen <organization|article|faqpage|breadcrumb>
   seogeo llms gen [--title <站点名>] [--summary <一句话简介>]
-  seogeo init [--site <站点名>] [--sitemap <url>] [--output <目录>]
+  seogeo init [--site <站点名>] [--sitemap <url>] [--output <目录>]      # 生成站点产物
+  seogeo init --agent <claude|codex|gemini|cursor|generic> [--output .] # 接入某 agent
   seogeo monitor prompts --industry <行业/品类>
   seogeo monitor run --industry <X> --brand <品牌> [--engines deepseek,openai] [--aliases a,b] [--competitors A,B]
   seogeo monitor score --answers <file.json> --brand <品牌> [--aliases a,b] [--competitors A,B]
@@ -13,12 +14,14 @@
 from __future__ import annotations
 
 import json
+import os
 import sys
 
 from seogeo.botverify import verify_bot_ip
 from seogeo.engines import available_engines, run_matrix
 from seogeo.generate import (
-    build_init_bundle, generate_llms, generate_robots, generate_schema, write_bundle,
+    build_agent_bundle, build_init_bundle, generate_llms, generate_robots,
+    generate_schema, write_bundle,
 )
 from seogeo.monitor import generate_prompts, score_answers, verdict
 from seogeo.report import render_json, render_markdown
@@ -32,6 +35,7 @@ _USAGE = (
     "  seogeo schema gen <organization|article|faqpage|breadcrumb>\n"
     "  seogeo llms gen [--title <站点名>] [--summary <一句话简介>]\n"
     "  seogeo init [--site <站点名>] [--sitemap <url>] [--output <目录>]\n"
+    "  seogeo init --agent <claude|codex|gemini|cursor|generic> [--output .]\n"
     "  seogeo monitor prompts --industry <行业/品类>\n"
     "  seogeo monitor run --industry <X> --brand <品牌> [--engines deepseek,openai] [--aliases a,b] [--competitors A,B]\n"
     "  seogeo monitor score --answers <file.json> --brand <品牌> [--aliases a,b] [--competitors A,B]"
@@ -93,7 +97,35 @@ def _cmd_llms(args: list) -> int:
     return 2
 
 
+def _init_agent(agent: str, out_dir: str) -> int:
+    try:
+        bundle = build_agent_bundle(agent)
+    except ValueError as e:
+        print(str(e))
+        return 2
+    wrote, skipped = [], []
+    for name, content in bundle.items():
+        path = os.path.join(out_dir, name)
+        if os.path.exists(path):  # 不覆盖用户已有文件
+            skipped.append(path)
+            continue
+        os.makedirs(os.path.dirname(path) or ".", exist_ok=True)
+        with open(path, "w", encoding="utf-8") as f:
+            f.write(content)
+        wrote.append(path)
+    for p in wrote:
+        print(f"✅ 写入：{p}")
+    for p in skipped:
+        print(f"⏭ 已存在，跳过（如需可手动并入 seogeo 段）：{p}")
+    print(f"\n{agent} 接入完成。支持 MCP 的话 .mcp.json 里的 seogeo 服务即可用"
+          "（需 pip install \"china-geo[mcp]\"）。")
+    return 0
+
+
 def _cmd_init(args: list) -> int:
+    agent = _arg(args, "--agent")
+    if agent:
+        return _init_agent(agent, _arg(args, "--output", "."))
     out_dir = _arg(args, "--output", "seogeo-output")
     bundle = build_init_bundle(
         site_title=_arg(args, "--site", "<站点名>"),
