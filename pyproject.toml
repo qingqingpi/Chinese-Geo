@@ -1,12 +1,17 @@
 [project]
 name = "china-geo"
-version = "0.0.1"
+version = "0.1.0"
 description = "中文 / 国内生态优先的开源 SEO + GEO 工具包（让站点被国内 AI 引擎抓取与引用）"
 readme = "README.md"
 license = {text = "MIT"}
 authors = [{name = "qingqingpi"}]
 requires-python = ">=3.9"
 dependencies = []  # 运行时零依赖（核心）
+
+[project.urls]
+Homepage = "https://github.com/qingqingpi/china-geo"
+Repository = "https://github.com/qingqingpi/china-geo"
+Issues = "https://github.com/qingqingpi/china-geo/issues"
 
 [project.optional-dependencies]
 render = ["playwright>=1.40"]  # 可选：JS 渲染对比
