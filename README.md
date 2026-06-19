@@ -31,8 +31,11 @@ git clone https://github.com/qingqingpi/china-geo
 cd china-geo
 pip install -e .
 
-seogeo audit example.com                  # 中文报告
-seogeo audit example.com --format json    # JSON（给 agent / CI）
+seogeo audit example.com                  # 体检：中文报告
+seogeo audit example.com --format json    # 体检：JSON（给 agent / CI）
+seogeo bots gen --sitemap https://example.com/sitemap.xml   # 生成推荐 robots.txt（国内各家单独成块）
+seogeo schema gen faqpage                 # 生成 JSON-LD 脚手架
+seogeo monitor prompts --industry "智能客服"     # 生成去品牌化问题（粘进各 AI 引擎收集回答）
 ```
 
 免安装直接跑：`python -m seogeo.cli audit example.com`
@@ -56,7 +59,8 @@ seogeo audit example.com --format json    # JSON（给 agent / CI）
 
 ## 🗺️ 路线图
 
-- [x] CLI `audit`：7 维度 AI 可见性体检（确定性引擎，81 测试）
+- [x] CLI `audit`：7 维度 AI 可见性体检（确定性引擎）
+- [x] CLI 生成半边：`bots gen`（推荐 robots.txt，国内各家单独成块）+ `schema gen`（JSON-LD 脚手架）
 - [ ] Bytespider 服务端硬拦探测 + 反向 DNS 真伪校验
 - [ ] 行动清单：预期效果（量化）+ 影响哪些引擎 + 怎么验证
 - [x] Agent Skill（中文门面：调 CLI 出中文行动清单；vendor-neutral，跑在 Claude Code / Codex / CodeBuddy / Qoder / Kimi 等）

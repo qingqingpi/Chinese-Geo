@@ -14,6 +14,7 @@ import sys
 from urllib.parse import urlparse
 
 from seogeo.fetch import fetch
+from seogeo.generate import generate_robots, generate_schema
 from seogeo.monitor import generate_prompts, score_answers, verdict
 from seogeo.pipeline import run_audit
 from seogeo.report import render_json, render_markdown
@@ -23,7 +24,9 @@ _USAGE = (
     "用法：\n"
     "  seogeo audit <域名或URL> [--format md|json]\n"
     "  seogeo monitor prompts --industry <行业/品类>\n"
-    "  seogeo monitor score --answers <file.json> --brand <品牌> [--aliases a,b] [--competitors A,B]"
+    "  seogeo monitor score --answers <file.json> --brand <品牌> [--aliases a,b] [--competitors A,B]\n"
+    "  seogeo bots gen [--sitemap <url>] [--no-domestic] [--no-overseas]\n"
+    "  seogeo schema gen <organization|article|faqpage|breadcrumb>"
 )
 
 
@@ -109,6 +112,30 @@ def _cmd_monitor(args: list) -> int:
     return 2
 
 
+def _cmd_bots(args: list) -> int:
+    if args and args[0] == "gen":
+        print(generate_robots(
+            allow_domestic="--no-domestic" not in args,
+            allow_overseas="--no-overseas" not in args,
+            sitemap_url=_arg(args, "--sitemap"),
+        ))
+        return 0
+    print(_USAGE)
+    return 2
+
+
+def _cmd_schema(args: list) -> int:
+    if len(args) >= 2 and args[0] == "gen":
+        try:
+            print(generate_schema(args[1]))
+        except ValueError as e:
+            print(str(e))
+            return 2
+        return 0
+    print("用法：seogeo schema gen <organization|article|faqpage|breadcrumb>")
+    return 2
+
+
 def main(argv: list | None = None) -> int:
     argv = argv if argv is not None else sys.argv[1:]
     cmd = argv[0] if argv else ""
@@ -116,6 +143,10 @@ def main(argv: list | None = None) -> int:
         return _cmd_audit(argv[1:])
     if cmd == "monitor":
         return _cmd_monitor(argv[1:])
+    if cmd == "bots":
+        return _cmd_bots(argv[1:])
+    if cmd == "schema":
+        return _cmd_schema(argv[1:])
     print(_USAGE)
     return 2
 
