@@ -215,11 +215,12 @@ def _cmd_offsite(args: list) -> int:
     if not plats:
         print("没有匹配平台。引擎：豆包/元宝/文心/通义/DeepSeek/Kimi；受众：b2b/consumer。")
         return 0
-    print("## 推荐平台（→ 喂哪些引擎 ｜ 受众 ｜ 开放/封闭 ｜ 打法）")
+    print("## 推荐平台（平台 → 喂哪些引擎 ｜ 受众 ｜ 开放/封闭；次行=被哪个搜索索引 + 打法）")
     for p in plats:
         aud = "/".join("B2B" if a == "b2b" else "消费" for a in p.audiences)
         kind = "开放" if p.open else "封闭(平台内SEO)"
-        print(f"- {p.name} → {'/'.join(p.engines)} ｜ {aud} ｜ {kind} ｜ {p.tip}")
+        print(f"- {p.name} → 喂 {'/'.join(p.engines)} ｜ {aud} ｜ {kind}")
+        print(f"    被索引：{p.indexed_by}　{p.tip}")
     print("\n## 一题多发（同文改写、多平台同步）")
     print(" / ".join(cross_post_set()) + " —— 一次产出、多源覆盖")
     closed = [p for p in plats if not p.open]

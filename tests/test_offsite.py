@@ -43,3 +43,25 @@ def test_cross_post_set_is_multi_platform():
 
 def test_recommend_no_filter_returns_all():
     assert len(recommend()) == len(DOMESTIC_PLATFORMS)
+
+
+# ---- websearch 索引层（平台 → 被哪个搜索索引 → 引擎联网后端）----
+
+def test_every_platform_declares_search_index():
+    for p in DOMESTIC_PLATFORMS:
+        assert p.indexed_by, f"{p.name} 未标注被哪个 websearch 索引"
+
+
+def test_wechat_official_is_sogou_gated():
+    gz = next(p for p in DOMESTIC_PLATFORMS if "公众号" in p.name)
+    assert "搜狗" in gz.indexed_by  # 公众号锁在搜狗（微信搜一搜）
+
+
+def test_toutiao_indexed_by_bytedance_own_search():
+    tt = next(p for p in DOMESTIC_PLATFORMS if "头条" in p.name)
+    assert "头条搜索" in tt.indexed_by  # 字节自家搜索，百度索引不到
+
+
+def test_open_platform_zhihu_broadly_indexed():
+    zh = next(p for p in DOMESTIC_PLATFORMS if p.name == "知乎")
+    assert "百度" in zh.indexed_by  # 开放站，被多搜索广泛索引

@@ -86,7 +86,8 @@ def monitor_run(industry: str, brand: str, engines: str = "",
 def offsite(engine: str = "", audience: str = "") -> list:
     """国内社媒 / 站外平台矩阵：按目标引擎（豆包/元宝/文心/通义/DeepSeek/Kimi）或受众（b2b/consumer）推荐分发平台。"""
     return [{"platform": p.name, "engines": list(p.engines), "audiences": list(p.audiences),
-             "open": p.open, "tip": p.tip} for p in recommend(engine or None, audience or None)]
+             "open": p.open, "indexed_by": p.indexed_by, "tip": p.tip}
+            for p in recommend(engine or None, audience or None)]
 
 
 def main() -> None:
