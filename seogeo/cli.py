@@ -13,11 +13,13 @@ import json
 import sys
 from urllib.parse import urlparse
 
+from seogeo.botverify import probe_bytespider_blocked, verify_bot_ip
 from seogeo.fetch import fetch
 from seogeo.generate import generate_robots, generate_schema
 from seogeo.monitor import generate_prompts, score_answers, verdict
 from seogeo.pipeline import run_audit
 from seogeo.report import render_json, render_markdown
+from seogeo.robots import classify_bot
 from seogeo.rules.base import AuditContext
 
 _USAGE = (
@@ -26,6 +28,7 @@ _USAGE = (
     "  seogeo monitor prompts --industry <行业/品类>\n"
     "  seogeo monitor score --answers <file.json> --brand <品牌> [--aliases a,b] [--competitors A,B]\n"
     "  seogeo bots gen [--sitemap <url>] [--no-domestic] [--no-overseas]\n"
+    "  seogeo bots verify <ip> <Baiduspider|Bytespider|PetalBot|Sogou web spider|YisouSpider>\n"
     "  seogeo schema gen <organization|article|faqpage|breadcrumb>"
 )
 
@@ -69,9 +72,15 @@ def _cmd_audit(args: list) -> int:
     llms_txt, _ = _fetch_text(origin + "/llms.txt")
     sitemap_xml, _ = _fetch_text(origin + "/sitemap.xml")
 
+    # 仅当 robots 想封 Bytespider 时才探测它是否真被服务端拦（它不守 robots）
+    bytespider_blocked = None
+    if robots_txt and classify_bot("Bytespider", robots_txt).status == "blocked":
+        bytespider_blocked = probe_bytespider_blocked(origin)
+
     ctx = AuditContext(url=origin, html=html or "",
                        robots_txt=robots_txt, robots_error=robots_error,
-                       llms_txt=llms_txt, sitemap_xml=sitemap_xml)
+                       llms_txt=llms_txt, sitemap_xml=sitemap_xml,
+                       bytespider_blocked=bytespider_blocked)
     result = run_audit(ctx)
     print(render_json(result) if fmt == "json" else render_markdown(result))
     return 1 if any(r["priority"] == "Critical" for r in result.recommendations) else 0
@@ -120,6 +129,11 @@ def _cmd_bots(args: list) -> int:
             sitemap_url=_arg(args, "--sitemap"),
         ))
         return 0
+    if len(args) >= 3 and args[0] == "verify":
+        ip, bot = args[1], args[2]
+        ok = verify_bot_ip(ip, bot)
+        print(f"{ip} 声称是 {bot}：" + ("✅ 真实（反向 + 正向 DNS 校验通过）" if ok else "❌ 伪造 / 无法校验"))
+        return 0 if ok else 1
     print(_USAGE)
     return 2
 

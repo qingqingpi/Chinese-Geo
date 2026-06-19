@@ -24,6 +24,7 @@ class AuditContext:
     sitemap_xml: str | None = None
     rendered_html: str | None = None
     dom: object | None = None  # 解析后的 DomScanner（由 pipeline 从 html 解析）
+    bytespider_blocked: bool | None = None  # Bytespider 服务端硬拦探测结果（None=未探测）
 
 
 @dataclass
