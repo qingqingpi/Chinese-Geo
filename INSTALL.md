@@ -4,16 +4,13 @@
 
 ## 第 1 步：装 CLI（必装，运行时零依赖）
 
-```bash
-pip install china-geo            # 得到 `seogeo` 命令（纯标准库）
-pip install "china-geo[mcp]"     # 想用 MCP 再加这个（得到 `seogeo-mcp`）
-```
-
-或源码安装：
+当前从源码安装（发行名 `china-geo`，命令名 `seogeo`；PyPI 发布后即可直接 `pip install china-geo`）：
 
 ```bash
 git clone https://github.com/qingqingpi/china-geo
-cd china-geo && pip install -e .
+cd china-geo
+pip install -e .            # 得到 `seogeo` 命令（纯标准库）
+pip install -e ".[mcp]"     # 想用 MCP 再加（得到 `seogeo-mcp`）
 ```
 
 装完，任何 agent 都能直接 shell 调：`seogeo audit example.com`。
