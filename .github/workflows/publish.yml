@@ -1,0 +1,30 @@
+# 发布到 PyPI：在 GitHub 上 publish 一个 Release 即自动构建并上传。
+#
+# 一次性设置（用 PyPI Trusted Publishing，无需 token / secret）：
+#   1. 登录 https://pypi.org → 你的项目 china-geo → 没有则先在 PyPI 建 "pending publisher"。
+#   2. Trusted Publisher 填：Owner=qingqingpi，Repo=china-geo，Workflow=publish.yml，Environment=pypi。
+#   3. 在本仓库 Settings → Environments 建一个名为 pypi 的 environment。
+# 之后每次 GitHub Release（建议 tag = v0.0.1 等）都会自动发包。
+name: Publish to PyPI
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-latest
+    environment: pypi
+    permissions:
+      id-token: write  # Trusted Publishing 用 OIDC，无需 API token
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Build sdist + wheel
+        run: |
+          pip install build
+          python -m build
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1

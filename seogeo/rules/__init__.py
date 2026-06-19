@@ -7,8 +7,12 @@ from seogeo.rules import (  # noqa: F401  （触发自注册）
     content,
     discovery,
     domestic_bots,
+    freshness,
+    https,
+    opengraph,
     overseas_bots,
     rendering,
     structure,
     technical,
+    viewport,
 )
