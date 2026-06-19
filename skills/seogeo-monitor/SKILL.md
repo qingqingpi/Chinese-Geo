@@ -23,6 +23,12 @@ description: 当用户想知道或追踪自己品牌在 AI 引擎（豆包/DeepS
    ```
 6. **解读 + 反推**（你来做）：见下。
 
+> **BYOK 自动档（可选，自带 key）**：配了引擎 API key（环境变量，如 `DEEPSEEK_API_KEY` / `OPENAI_API_KEY` / `PERPLEXITY_API_KEY` / `DASHSCOPE_API_KEY` / `ARK_API_KEY` / `MOONSHOT_API_KEY`）后，一条命令替你跑完步骤 2–5：
+> ```bash
+> seogeo monitor run --industry "<行业>" --brand "<品牌>" [--engines deepseek,openai] [--competitors 竞品A,竞品B]
+> ```
+> 注意：API 模型默认不联网检索（Perplexity 除外），与消费版 App 的联网回答可能不同——要测真实联网引用，仍以手动粘贴（上面的零 key 档）为准。
+
 ## 怎么解读
 
 - **引用率** = 被引问题数 ÷ 答题数（按引擎分别算）。基准：**<10% 差 / 10–30% 良 / >30% 优**。

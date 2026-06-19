@@ -23,6 +23,17 @@ class AuditResult:
 
 _PRIO_ORDER = {"Critical": 0, "High": 1, "Quick Win": 2}
 
+# 每类问题修好后利好哪些引擎——让纯 CLI 用户（无 skill/agent）也拿到策略上下文。
+_CAT_ENGINES = {
+    "domestic": "国内联网引擎：文心/百度AI(Baiduspider)、豆包(Bytespider)、元宝(Sogou)、夸克/通义(YisouSpider)、小艺(PetalBot)",
+    "overseas": "海外引擎：ChatGPT、Perplexity、Claude、Google AI（各自爬虫）",
+    "discovery": "利于百度/搜狗收录 → 文心、元宝等国内引擎更易检索到",
+    "structure": "全引擎通用：结构化数据帮所有 AI 理解实体与问答",
+    "content": "全引擎通用：可引用形态对国内外引擎都有效",
+    "rendering": "全引擎通用：爬虫拿不到 JS 渲染结果就等于空页",
+    "technical": "全引擎通用：语言 / 规范化是被正确收录的底线",
+}
+
 
 def build_recommendations(outcomes) -> list:
     recs = []
@@ -39,7 +50,8 @@ def build_recommendations(outcomes) -> list:
         else:
             prio = "Quick Win"
         recs.append({"priority": prio, "category": o.category, "points": gap,
-                     "text": o.recommendation, "rule_id": o.id})
+                     "text": o.recommendation, "rule_id": o.id,
+                     "engines": _CAT_ENGINES.get(o.category, "")})
     return sorted(recs, key=lambda r: (_PRIO_ORDER[r["priority"]], -r["points"]))
 
 
@@ -95,4 +107,11 @@ def render_markdown(result: AuditResult) -> str:
                 lines.append(f"\n### {_PRIO_ICON.get(cur, cur)}")
             cat_cn = _CAT_CN.get(r["category"], r["category"])
             lines.append(f"- **[+{r['points']}分 · {cat_cn}]** {r['text']}")
+            if r.get("engines"):
+                lines.append(f"  - 影响引擎：{r['engines']}")
+        lines += [
+            "",
+            "> 验证闭环：改完重跑 `seogeo audit` 看对应项转绿；上线几周后用 "
+            "`seogeo monitor` 抽样看引用率 / SoV 是否回升（GEO 要持续监控，不是一次性）。",
+        ]
     return "\n".join(lines)

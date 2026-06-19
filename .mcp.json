@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "seogeo": {
+      "command": "seogeo-mcp",
+      "args": []
+    }
+  }
+}

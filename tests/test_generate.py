@@ -5,7 +5,13 @@
 """
 import pytest
 
-from seogeo.generate import generate_robots, generate_schema
+from seogeo.generate import (
+    build_init_bundle,
+    generate_llms,
+    generate_robots,
+    generate_schema,
+    write_bundle,
+)
 
 
 # ---- robots ----
@@ -70,3 +76,66 @@ def test_schema_wrapped_in_script_tag():
 def test_schema_unknown_raises():
     with pytest.raises(ValueError):
         generate_schema("nonsense")
+
+
+# ---- llms.txt ----
+
+def test_llms_starts_with_title_h1():
+    assert generate_llms("示例公司").startswith("# 示例公司")
+
+
+def test_llms_summary_as_blockquote():
+    assert "> 一句话简介" in generate_llms("示例公司", summary="一句话简介")
+
+
+def test_llms_has_section_with_link_bullets():
+    # llms.txt 规范核心结构：至少一个 H2 段 + markdown 链接条目
+    out = generate_llms("示例公司")
+    assert "## " in out
+    assert "](" in out
+
+
+def test_llms_renders_given_links():
+    out = generate_llms("示例公司", links=[("产品介绍", "https://x.com/p", "核心产品")])
+    assert "[产品介绍](https://x.com/p)" in out
+    assert "核心产品" in out
+
+
+def test_llms_notes_overseas_oriented():
+    # 诚实标注：llms.txt 主要面向海外引擎（国内基本无效）
+    assert "海外" in generate_llms("示例公司")
+
+
+# ---- init bundle ----
+
+def test_init_bundle_has_four_artifacts():
+    bundle = build_init_bundle("示例公司")
+    assert {"robots.txt", "llms.txt"} <= set(bundle)
+    assert any("schema" in k for k in bundle)
+    assert any(k.endswith(".md") for k in bundle)  # canonical / meta 清单
+
+
+def test_init_bundle_robots_carries_sitemap():
+    bundle = build_init_bundle("示例公司", sitemap_url="https://x.com/sitemap.xml")
+    assert "Sitemap: https://x.com/sitemap.xml" in bundle["robots.txt"]
+
+
+def test_init_bundle_llms_uses_site_title():
+    assert "# 示例公司" in build_init_bundle("示例公司")["llms.txt"]
+
+
+def test_init_bundle_canonical_checklist_mentions_canonical_and_lang():
+    bundle = build_init_bundle("示例公司")
+    md = next(v for k, v in bundle.items() if k.endswith(".md"))
+    assert "canonical" in md.lower()
+    assert "lang" in md.lower()  # <html lang> 也在清单里
+
+
+# ---- write_bundle ----
+
+def test_write_bundle_creates_dir_and_files(tmp_path):
+    out = str(tmp_path / "out")  # 目录尚不存在，应被创建
+    paths = write_bundle({"robots.txt": "X", "llms.txt": "Y"}, out)
+    assert (tmp_path / "out" / "robots.txt").read_text(encoding="utf-8") == "X"
+    assert (tmp_path / "out" / "llms.txt").read_text(encoding="utf-8") == "Y"
+    assert len(paths) == 2

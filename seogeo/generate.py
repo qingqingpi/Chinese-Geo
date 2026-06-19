@@ -7,6 +7,7 @@
 from __future__ import annotations
 
 import json
+import os
 
 from seogeo.data.domestic_bots import DOMESTIC_BOTS
 from seogeo.data.overseas_bots import OVERSEAS_BOTS
@@ -70,3 +71,84 @@ def generate_schema(schema_type: str) -> str:
         raise ValueError(f"未知 schema 类型：{schema_type}（支持：{', '.join(_SCHEMA_TEMPLATES)}）")
     body = json.dumps(_SCHEMA_TEMPLATES[key], ensure_ascii=False, indent=2)
     return f'<script type="application/ld+json">\n{body}\n</script>'
+
+
+def generate_llms(title: str, summary: str | None = None,
+                  links: list | None = None) -> str:
+    """生成 llms.txt 脚手架（遵循 llmstxt.org 规范，带占位符）。
+
+    诚实提醒写进文件：llms.txt 国内基本无效，主要面向海外 AI 引擎（ChatGPT /
+    Claude / Perplexity）；国内 GEO 主战场是联网检索，靠 robots 准入 + 站外分发。
+    """
+    summary = summary or "<一句话介绍：你是谁、为谁解决什么问题>"
+    rows = links or [("<核心页面标题>", "https://<域名>/<路径>", "<这页讲什么，便于 AI 取用>")]
+    out = [
+        f"# {title}",
+        "",
+        f"> {summary}",
+        "",
+        "<!-- 说明（发布前可删）：llms.txt 主要面向海外 AI 引擎（ChatGPT / Claude / "
+        "Perplexity）；国内引擎基本不读，国内 GEO 靠 robots 准入 + 站外分发。 -->",
+        "",
+        "## 核心页面",
+        "",
+    ]
+    for row in rows:
+        text, url = row[0], row[1]
+        desc = row[2] if len(row) > 2 else ""
+        out.append(f"- [{text}]({url})" + (f": {desc}" if desc else ""))
+    out += [
+        "",
+        "## 可选",
+        "",
+        "- [关于我们](https://<域名>/about): 团队 / 资质 / 背书（E-E-A-T 信号）",
+    ]
+    return "\n".join(out).rstrip() + "\n"
+
+
+_CANONICAL_CHECKLIST = """\
+# canonical / meta 逐页自查清单（seogeo 生成）
+
+每页都过一遍——这些是 AI 爬虫"看懂并愿意引用"的技术底线。
+
+## 每页必备
+- [ ] `<html lang="zh-CN">`：声明语言，避免被当成乱码或误判地区
+- [ ] `<link rel="canonical" href="https://域名/本页规范地址">`：指向唯一规范 URL，避免重复内容稀释权重
+- [ ] `<title>`：每页唯一、含核心关键词，≤ 30 字
+- [ ] `<meta name="description">`：60–120 字，结论前置、像在直接回答问题
+- [ ] 唯一 `<h1>`：与 title 呼应，全页仅一个
+- [ ] 正文 ≥ 300 字，用 h2/h3 切分；关键结论配列表或表格（被引用率更高）
+
+## 社交 / 抓取增强
+- [ ] Open Graph：`og:title` / `og:description` / `og:image` / `og:url`
+- [ ] 结构化数据：见同目录 schema-*.html，按页面类型选 Article / FAQPage / Organization
+- [ ] 图片 `alt`：描述性文字，便于多模态抓取
+
+## 站点级
+- [ ] robots.txt（见同目录）：国内爬虫各家单独成块；Bytespider 另在服务端 / WAF 硬拦
+- [ ] sitemap.xml：列全可索引页，提交到百度 / 搜狗资源平台
+- [ ] HTTPS、移动端自适应、首屏不靠纯前端渲染（AI 爬虫常拿不到 JS 结果）
+"""
+
+
+def build_init_bundle(site_title: str = "<站点名>", sitemap_url: str | None = None,
+                      summary: str | None = None) -> dict:
+    """一键入门产物包：robots.txt / llms.txt / schema 脚手架 / canonical 清单。"""
+    return {
+        "robots.txt": generate_robots(sitemap_url=sitemap_url),
+        "llms.txt": generate_llms(site_title, summary),
+        "schema-organization.html": generate_schema("organization"),
+        "canonical-meta-checklist.md": _CANONICAL_CHECKLIST,
+    }
+
+
+def write_bundle(bundle: dict, output_dir: str) -> list:
+    """把产物包写到 output_dir（不存在则创建），返回写入的文件路径列表。"""
+    os.makedirs(output_dir, exist_ok=True)
+    written = []
+    for name, content in bundle.items():
+        path = os.path.join(output_dir, name)
+        with open(path, "w", encoding="utf-8") as f:
+            f.write(content)
+        written.append(path)
+    return written

@@ -1,0 +1,16 @@
+{
+  "name": "seogeo",
+  "description": "国内生态优先的 SEO + GEO 工具：让网站被国内（豆包/DeepSeek/文心/通义/元宝/Kimi）与海外（ChatGPT/Claude/Perplexity/Google AI）AI 引擎抓取与引用。体检爬虫准入·结构·可引用性，生成 robots+schema+llms，引用率/SoV 监控。",
+  "version": "0.0.1",
+  "author": {
+    "name": "qingqingpi",
+    "url": "https://github.com/qingqingpi/china-geo"
+  },
+  "homepage": "https://github.com/qingqingpi/china-geo",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/qingqingpi/china-geo.git"
+  },
+  "license": "MIT",
+  "keywords": ["seo", "geo", "ai-search", "robots", "schema", "豆包", "deepseek"]
+}

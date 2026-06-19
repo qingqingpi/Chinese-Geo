@@ -4,7 +4,10 @@
   seogeo bots gen [--sitemap <url>] [--no-domestic] [--no-overseas]
   seogeo bots verify <ip> <bot>
   seogeo schema gen <organization|article|faqpage|breadcrumb>
+  seogeo llms gen [--title <站点名>] [--summary <一句话简介>]
+  seogeo init [--site <站点名>] [--sitemap <url>] [--output <目录>]
   seogeo monitor prompts --industry <行业/品类>
+  seogeo monitor run --industry <X> --brand <品牌> [--engines deepseek,openai] [--aliases a,b] [--competitors A,B]
   seogeo monitor score --answers <file.json> --brand <品牌> [--aliases a,b] [--competitors A,B]
 """
 from __future__ import annotations
@@ -13,7 +16,10 @@ import json
 import sys
 
 from seogeo.botverify import verify_bot_ip
-from seogeo.generate import generate_robots, generate_schema
+from seogeo.engines import available_engines, run_matrix
+from seogeo.generate import (
+    build_init_bundle, generate_llms, generate_robots, generate_schema, write_bundle,
+)
 from seogeo.monitor import generate_prompts, score_answers, verdict
 from seogeo.report import render_json, render_markdown
 from seogeo.service import audit_url
@@ -24,7 +30,10 @@ _USAGE = (
     "  seogeo bots gen [--sitemap <url>] [--no-domestic] [--no-overseas]\n"
     "  seogeo bots verify <ip> <Baiduspider|Bytespider|PetalBot|Sogou web spider|YisouSpider>\n"
     "  seogeo schema gen <organization|article|faqpage|breadcrumb>\n"
+    "  seogeo llms gen [--title <站点名>] [--summary <一句话简介>]\n"
+    "  seogeo init [--site <站点名>] [--sitemap <url>] [--output <目录>]\n"
     "  seogeo monitor prompts --industry <行业/品类>\n"
+    "  seogeo monitor run --industry <X> --brand <品牌> [--engines deepseek,openai] [--aliases a,b] [--competitors A,B]\n"
     "  seogeo monitor score --answers <file.json> --brand <品牌> [--aliases a,b] [--competitors A,B]"
 )
 
@@ -76,6 +85,41 @@ def _cmd_schema(args: list) -> int:
     return 2
 
 
+def _cmd_llms(args: list) -> int:
+    if args and args[0] == "gen":
+        print(generate_llms(_arg(args, "--title", "<站点名>"), _arg(args, "--summary")))
+        return 0
+    print("用法：seogeo llms gen [--title <站点名>] [--summary <一句话简介>]")
+    return 2
+
+
+def _cmd_init(args: list) -> int:
+    out_dir = _arg(args, "--output", "seogeo-output")
+    bundle = build_init_bundle(
+        site_title=_arg(args, "--site", "<站点名>"),
+        sitemap_url=_arg(args, "--sitemap"),
+        summary=_arg(args, "--summary"),
+    )
+    paths = write_bundle(bundle, out_dir)
+    print(f"✅ 已生成 {len(paths)} 个文件到 {out_dir}/：")
+    for p in paths:
+        print(f"  - {p}")
+    print("\n下一步：把文件里的占位符 <…> 改成真实信息；robots.txt / llms.txt 放站点根目录，"
+          "schema 片段贴进 <head>，按 canonical 清单逐页自查。")
+    return 0
+
+
+def _print_score(result: dict, brand: str) -> None:
+    print(f"# 引用监控（品牌：{brand}）\n")
+    for engine, m in result.items():
+        if engine == "_overall":
+            continue
+        print(f"- {engine}：引用率 {m['citation_rate']:.0%}（{verdict(m['citation_rate'])}）"
+              f" ｜ SoV {m['share_of_voice']:.0%} ｜ 提及 {m['brand_mentions']} 次 / 答 {m['answered']} 题")
+    ov = result["_overall"]["citation_rate"]
+    print(f"\n总引用率：{ov:.0%}（{verdict(ov)}）　基准：<10% 差 / 10–30% 良 / >30% 优")
+
+
 def _cmd_monitor(args: list) -> int:
     sub = args[0] if args else ""
     if sub == "prompts":
@@ -96,15 +140,28 @@ def _cmd_monitor(args: list) -> int:
         competitors = {name: [] for name in _csv(args, "--competitors")}
         with open(path, encoding="utf-8") as f:
             answers = json.load(f)
-        result = score_answers(answers, brand, _csv(args, "--aliases"), competitors)
-        print(f"# 引用监控（品牌：{brand}）\n")
-        for engine, m in result.items():
-            if engine == "_overall":
-                continue
-            print(f"- {engine}：引用率 {m['citation_rate']:.0%}（{verdict(m['citation_rate'])}）"
-                  f" ｜ SoV {m['share_of_voice']:.0%} ｜ 提及 {m['brand_mentions']} 次 / 答 {m['answered']} 题")
-        ov = result["_overall"]["citation_rate"]
-        print(f"\n总引用率：{ov:.0%}（{verdict(ov)}）　基准：<10% 差 / 10–30% 良 / >30% 优")
+        _print_score(score_answers(answers, brand, _csv(args, "--aliases"), competitors), brand)
+        return 0
+    if sub == "run":
+        industry = _arg(args, "--industry")
+        brand = _arg(args, "--brand")
+        if not industry or not brand:
+            print("需要 --industry <行业/品类> 和 --brand <品牌>")
+            return 2
+        avail = available_engines()
+        if not avail:
+            print("没有可用引擎：先设置至少一个 API key 环境变量，例如 DEEPSEEK_API_KEY / "
+                  "OPENAI_API_KEY / PERPLEXITY_API_KEY / DASHSCOPE_API_KEY / ARK_API_KEY / MOONSHOT_API_KEY。")
+            return 2
+        only = _csv(args, "--engines") or None
+        used = [e for e in (only or avail) if e in avail]
+        prompts = [p["text"] for p in generate_prompts(industry)]
+        print(f"# BYOK 自动跑：{len(prompts)} 问 × {len(used)} 引擎（{', '.join(used)}）…", file=sys.stderr)
+        answers = run_matrix(prompts, engines=only)
+        competitors = {name: [] for name in _csv(args, "--competitors")}
+        _print_score(score_answers(answers, brand, _csv(args, "--aliases"), competitors), brand)
+        print("\n注：BYOK 调的是各引擎 API 模型，默认不联网检索（Perplexity 除外）；"
+              "要测真实联网引用，仍以消费版手动粘贴为准（monitor prompts + score）。")
         return 0
     print(_USAGE)
     return 2
@@ -113,7 +170,8 @@ def _cmd_monitor(args: list) -> int:
 def main(argv: list | None = None) -> int:
     argv = argv if argv is not None else sys.argv[1:]
     cmd = argv[0] if argv else ""
-    dispatch = {"audit": _cmd_audit, "bots": _cmd_bots, "schema": _cmd_schema, "monitor": _cmd_monitor}
+    dispatch = {"audit": _cmd_audit, "bots": _cmd_bots, "schema": _cmd_schema,
+                "llms": _cmd_llms, "init": _cmd_init, "monitor": _cmd_monitor}
     if cmd in dispatch:
         return dispatch[cmd](argv[1:])
     print(_USAGE)

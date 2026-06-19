@@ -1,0 +1,21 @@
+{
+  "name": "china-geo",
+  "owner": {
+    "name": "qingqingpi",
+    "url": "https://github.com/qingqingpi"
+  },
+  "plugins": [
+    {
+      "name": "seogeo",
+      "description": "国内生态优先的 SEO + GEO 工具：体检爬虫准入/结构/可引用性，生成 robots+schema+llms，零 key 引用率·SoV 监控。5 个 skill + 7 个 MCP 工具。",
+      "version": "0.0.1",
+      "source": {
+        "source": "github",
+        "repo": "qingqingpi/china-geo"
+      },
+      "homepage": "https://github.com/qingqingpi/china-geo",
+      "license": "MIT",
+      "keywords": ["seo", "geo", "ai-search"]
+    }
+  ]
+}

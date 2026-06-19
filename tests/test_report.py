@@ -71,3 +71,22 @@ def test_render_markdown_has_score_and_critical_section():
     assert "29/100" in md
     assert "必须修" in md  # 🔴 Critical 分节
     assert "为 Bytespider 单独成块并 Allow: /" in md  # 行动建议文本出现
+
+
+# ---- 影响引擎 + 验证闭环（让纯 CLI 用户也拿到策略上下文，不必依赖 skill/agent）----
+
+def test_recommendation_carries_affected_engines():
+    recs = build_recommendations([_oc("domestic-bot-access", "domestic", "fail", 0, 20)])
+    assert recs[0]["engines"]  # 非空
+    assert any(k in recs[0]["engines"] for k in ("文心", "豆包", "国内"))  # 点名国内引擎
+
+
+def test_overseas_recommendation_names_overseas_engines():
+    recs = build_recommendations([_oc("overseas-bot-access", "overseas", "fail", 0, 12)])
+    assert any(k in recs[0]["engines"] for k in ("ChatGPT", "Perplexity", "海外"))
+
+
+def test_markdown_shows_affected_engines_and_verify_note():
+    md = render_markdown(_result())
+    assert "影响引擎" in md
+    assert "验证" in md and "monitor" in md  # 验证闭环引导到持续监控
