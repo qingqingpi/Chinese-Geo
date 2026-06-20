@@ -1,7 +1,5 @@
 # LOOP.md — Chinese-Geo 自动推进循环
 
-> ⏸️ **暂停待 review（Track B 收尾，2026-06-20）**：Track A + B 已全 `[x]`，按分轨复审闸**停在此**。**任何 loop 迭代（含定时器自动触发）读到本横幅：先停、只输出"Track A+B 已完成、待 review"，别进 Track C。** 用户明确要续 Track C 时删掉本横幅再继续。
-
 > 给 AI 编程 Agent（Claude Code 等）用：一轮一轮把下面的 BACKLOG 做完。
 > 配套读 `AGENTS.md`（项目是什么、CLI/Skill 清单、开发约定）。本文件只管"重心、怎么循环、做什么、不许做什么"。
 > **命令名＝`chinese-geo`**（2026-06-20 改名，内部 Python 模块仍 `seogeo`，`python -m seogeo.cli ...` 不变）。
@@ -75,7 +73,7 @@
 - [x] B4. **README 示例输出换成真实的**：用 B3 的真实输出替换 README 里手写的假样例（诚实化）。 ✅ 完成：README「示例输出」换成 example.com 真实报告摘录（63/100、真实分项 + 必修项）+ 链到完整 `examples/sample-report.md`；删掉旧手写假样例（20/100）；`test_readme_sample.py` 钉"示例总分 = 真实报告总分"防再造假；320 测试。
 
 ### Track C —— 产品化（开发者级）
-- [ ] C1. **`examples/` 目录**：fixture 站（一个"差站"+ 期望改进点）、一条 quickstart 脚本、真实样例报告（B3）。
+- [x] C1. **`examples/` 目录**：fixture 站（一个"差站"+ 期望改进点）、一条 quickstart 脚本、真实样例报告（B3）。 ✅ 完成：`examples/bad-site.html`（故意做差的反面教材，`run_audit` 实测 **52/100**、报 content/structure/discovery 必修项）+ `examples/quickstart.sh`（跑刚 clone 的源码 `demo`，零网络实测 33→100）+ `examples/README.md`（期望改进点表 + 指 `sample-report.md`）；`test_examples.py` 6 项钉"源码层缺要件 + 真实低分"防漂移（差站偷偷改好会变红）；326 测试。
 - [ ] C2. **quickstart 打磨**：README"快速开始"做到 clone→一条命令→看到结果；把 `chinese-geo demo` 放到首屏。
 - [ ] C3. **文档同步过一遍**：INSTALL/AGENTS/README 与 A/B 的新能力对齐。
 
