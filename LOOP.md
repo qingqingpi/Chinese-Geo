@@ -1,5 +1,7 @@
 # LOOP.md — Chinese-Geo 自动推进循环
 
+> ⏸️ **暂停待 review（Track A 收尾，2026-06-20）**：Track A（A1/A1b/A2/A3/A4）已全 `[x]`，按分轨复审闸**停在此**。**任何 loop 迭代（含定时器自动触发）读到本横幅：先停、只输出"Track A 已完成、待 review"，别进 Track B。** 用户明确要续 Track B 时删掉本横幅再继续。
+
 > 给 AI 编程 Agent（Claude Code 等）用：一轮一轮把下面的 BACKLOG 做完。
 > 配套读 `AGENTS.md`（项目是什么、CLI/Skill 清单、开发约定）。本文件只管"重心、怎么循环、做什么、不许做什么"。
 > **命令名＝`chinese-geo`**（2026-06-20 改名，内部 Python 模块仍 `seogeo`，`python -m seogeo.cli ...` 不变）。
@@ -64,7 +66,7 @@
 - [x] A1b. **扩 `init --agent`：Qoder / Trae / Lingma**。✅ qoder→`AGENTS.md`+`MCP-SETUP-qoder.md`(UI-only)、trae→`.trae/rules/project_rules.md`+`.trae/mcp.json`、lingma→`.lingma/rules/seogeo.md`+`MCP-SETUP-lingma.md`；新增 `guidance` 策略 + `mcp_path` 覆写。
 - [x] A2. **每个 agent 一份"用法卡"** `docs/agents/<name>.md`。✅ 8 张卡（claude/codex/codebuddy/kimi/opencode/qoder/trae/lingma）+ 共享 `cli-output-samples.md`（真跑落盘）；`test_agent_docs.py` 落点同步防漂移；命令统一 chinese-geo。
 - [x] A3. **每个 agent 一份人工验证清单** `docs/verify/VERIFY-<name>.md`：在真 agent 里实跑、勾选、贴 transcript/截图的模板（loop 备好，⏳ 人来执行）。 ✅ 完成：8 份 `VERIFY-<name>.md`（claude/codex/codebuddy/kimi/opencode/qoder/trae/lingma）——环境 / 落点(与 build_agent_bundle 一致) / CLI 直调 / 原生调法 勾选清单 + ⏳ 待人工填实跑结果；`test_verify_docs.py` 32 项防漂移；288 测试。
-- [ ] A4. **跨 agent 接入冒烟测试**：临时目录里验证 `init --agent <X>` 产出正确指令文件 + 正确 MCP 键名/路径、不覆盖已有（零网络）。
+- [x] A4. **跨 agent 接入冒烟测试**：临时目录里验证 `init --agent <X>` 产出正确指令文件 + 正确 MCP 键名/路径、不覆盖已有（零网络）。 ✅ 完成：`test_init_agent_smoke.py`——经 CLI `main` 在临时目录实跑 11 agent 的 `init --agent`，验落点齐全 + opencode `mcp`/`type` 特判 + 标准 `chinese-geo`/`chinese-geo-mcp` 键 + Trae 落 `.trae/mcp.json` + guidance 写 `MCP-SETUP-*.md` + 不覆盖已有 + 未知 agent 报错；零网络；305 测试。
 
 ### Track B —— 可证明的结果（真实站点案例 harness）
 - [ ] B1. **`chinese-geo demo` 命令**：对内置 fixture 站跑通"体检→生成修复→（对 fixture）应用→复检"，打印**前后分数对比**；零 key、可复现，作为最小自证。
