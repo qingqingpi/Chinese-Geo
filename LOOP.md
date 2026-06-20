@@ -1,5 +1,7 @@
 # LOOP.md — Chinese-Geo 自动推进循环
 
+> ⏸️ **暂停待 review（Track B 收尾，2026-06-20）**：Track A + B 已全 `[x]`，按分轨复审闸**停在此**。**任何 loop 迭代（含定时器自动触发）读到本横幅：先停、只输出"Track A+B 已完成、待 review"，别进 Track C。** 用户明确要续 Track C 时删掉本横幅再继续。
+
 > 给 AI 编程 Agent（Claude Code 等）用：一轮一轮把下面的 BACKLOG 做完。
 > 配套读 `AGENTS.md`（项目是什么、CLI/Skill 清单、开发约定）。本文件只管"重心、怎么循环、做什么、不许做什么"。
 > **命令名＝`chinese-geo`**（2026-06-20 改名，内部 Python 模块仍 `seogeo`，`python -m seogeo.cli ...` 不变）。
@@ -70,7 +72,7 @@
 - [x] B1. **`chinese-geo demo` 命令**：对内置 fixture 站跑通"体检→生成修复→（对 fixture）应用→复检"，打印**前后分数对比**；零 key、可复现，作为最小自证。 ✅ 完成：`seogeo/demo.py`——用 chinese-geo 自己的生成器（generate_schema/robots）把差站修成好站，run_audit 前后对比实测 **33→100（Δ+67）**、必修项 4→0；`chinese-geo demo` 打印分项前后表；零网络、可复现；`test_demo.py` 5 项（含确定性）+ cli 1 项；311 测试。
 - [x] B2. **真实站点案例研究模板** `docs/case-study/TEMPLATE.md`：固定字段 + 采集 schema(JSON) + monitor prompt 矩阵步骤。**⏳ 真实数据人来填**。 ✅ 完成：基本信息 / 体检前后 7 维表 / 改了什么 / 引用率·SoV 前后 + monitor 步骤 / 合法 JSON 采集 schema / 结论，全字段 ⏳ 占位、零编造；`test_case_study.py` 4 项（含 JSON 可解析 + 术语中性）；315 测试。
 - [x] B3. **提交一份真实样例 audit 报告** `examples/sample-report.md`：loop 跑 `chinese-geo audit <真实公开站>` 抓**真实**输出落盘。 ✅ 完成：实跑 `chinese-geo audit https://example.com` 落盘真实报告（63/100、7 维分项 + 🔴必修清单，非手写）；带重现说明；`test_sample_report.py` 3 项钉真实结构 + 术语中性；318 测试。
-- [ ] B4. **README 示例输出换成真实的**：用 B3 的真实输出替换 README 里手写的假样例（诚实化）。
+- [x] B4. **README 示例输出换成真实的**：用 B3 的真实输出替换 README 里手写的假样例（诚实化）。 ✅ 完成：README「示例输出」换成 example.com 真实报告摘录（63/100、真实分项 + 必修项）+ 链到完整 `examples/sample-report.md`；删掉旧手写假样例（20/100）；`test_readme_sample.py` 钉"示例总分 = 真实报告总分"防再造假；320 测试。
 
 ### Track C —— 产品化（开发者级）
 - [ ] C1. **`examples/` 目录**：fixture 站（一个"差站"+ 期望改进点）、一条 quickstart 脚本、真实样例报告（B3）。

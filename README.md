@@ -48,15 +48,23 @@ Claude Code 一键装成插件（含 6 个技能 + MCP），以及 Codex / Curso
 
 ### 示例输出
 
-```
-# chinese-geo 体检报告：https://www.example.com
-**总分 20/100 · 等级：亟需整改**
+真实样例（`chinese-geo audit https://example.com` 实跑，完整见 [examples/sample-report.md](examples/sample-report.md)）：
 
-## 优先级修复清单
+```
+# chinese-geo 体检报告：https://example.com
+**总分 63/100 · 等级：待打基础**
+
+## 分项得分
+| 维度 | 得分 |
+|---|---|
+| ★国内 AI 爬虫准入 | 26/26 |
+| 内容可引用性 | 4/24 |
+| 结构化 | 3/22 |
+| …（完整 7 维 + 🔴 必修清单见 examples/sample-report.md）
+
 ### 🔴 必须修
-- [+20分 · ★国内 AI 爬虫准入] robots.txt 挡住了国内 AI 爬虫：Bytespider——各自单独写 User-agent 块并 Allow: /（Bytespider 不完全遵守 robots，必要时还需服务端 / WAF 硬拦）
-- [+16分 · 内容可引用性] 补强：唯一 H1 主标题、H2 小节切分、正文≥300字、列表/表格
-- [+16分 · 结构化] 添加 Organization / Article / FAQPage 等 JSON-LD
+- **[+16分 · 内容可引用性]** 补强：H2 小节切分、正文≥300字、列表/表格（利于被 AI 抽取引用）
+- **[+16分 · 结构化]** 添加 Organization / Article / FAQPage 等 JSON-LD（schema.org）
 ```
 
 ## 🧭 为什么国内要单独一套
