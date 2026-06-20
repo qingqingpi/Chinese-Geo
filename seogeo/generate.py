@@ -147,14 +147,46 @@ _AGENT_MCP_JSON = json.dumps(
     ensure_ascii=False, indent=2,
 ) + "\n"
 
-# 各 agent 的指令文件落点（事实标准 / 各家约定）
-_AGENT_INSTRUCTION_FILE = {
-    "claude": "CLAUDE.md",
-    "codex": "AGENTS.md",
-    "gemini": "GEMINI.md",
-    "cursor": ".cursor/rules/seogeo.mdc",
-    "generic": "AGENTS.md",
+# opencode 用键 `mcp`、每个 server 带 `type`（不是通用的 mcpServers）
+_OPENCODE_MCP_JSON = json.dumps(
+    {"$schema": "https://opencode.ai/config.json",
+     "mcp": {"chinese-geo": {"type": "local", "command": ["chinese-geo-mcp"], "enabled": True}}},
+    ensure_ascii=False, indent=2,
+) + "\n"
+
+# Kimi 的 MCP 是全局 ~/.kimi/mcp.json——不碰用户 home，给可手动粘贴的指引
+_KIMI_MCP_SETUP = """\
+# Kimi CLI 接入 chinese-geo MCP（手动一步）
+
+Kimi 的 MCP 配置是**全局**的（`~/.kimi/mcp.json`），不在项目内，所以这里不自动写你的 home 目录。
+把下面这段并入 `~/.kimi/mcp.json`（已有就合并 `mcpServers`），或用 `kimi --mcp-config-file <此文件>`：
+
+```json
+{
+  "mcpServers": {
+    "chinese-geo": { "command": "chinese-geo-mcp", "args": [] }
+  }
 }
+```
+
+需先 `pip install "Chinese-Geo[mcp]"`，让 `chinese-geo-mcp` 在 PATH 上；指令文件 `AGENTS.md` 已就位，Kimi 自动读到。
+"""
+
+# Qoder / 通义灵码 等的 MCP 是 UI-only（设置面板里配、无稳定项目级文件）——不碰其 app 私有路径，给手动指引
+_UI_MCP_LABELS = {"qoder": "Qoder", "lingma": "通义灵码 Lingma"}
+
+
+def _ui_mcp_setup(agent_key: str) -> str:
+    label = _UI_MCP_LABELS.get(agent_key, agent_key)
+    return (
+        f"# {label} 接入 chinese-geo MCP（手动一步）\n\n"
+        f"{label} 的 MCP 在**设置面板**里配置（UI-only，无稳定的项目级配置文件），"
+        f"所以这里不替你写它的私有路径。\n"
+        f"打开 {label} 的 MCP / 工具设置，新增一个 server，把下面这段贴进去：\n\n"
+        f"```json\n{_AGENT_MCP_JSON.rstrip()}\n```\n\n"
+        f"需先 `pip install \"Chinese-Geo[mcp]\"`，让 `chinese-geo-mcp` 在 PATH 上；"
+        f"指令文件已就位，{label} 会自动读到。\n"
+    )
 
 _AGENT_BLURB = """\
 # chinese-geo —— AI 可见性 / GEO 优化工具（本项目已接入）
@@ -178,12 +210,52 @@ optimize（全流程总入口）/ audit / structure / content / offsite / monito
 """
 
 
+# 各 agent 接入落点（指令文件 + MCP 策略）。已核 2025–2026 各家官方约定。
+#  standard   → 项目级 MCP 文件（mcpServers），默认 `.mcp.json`；可用 mcp_path 改落点（如 Trae 的 .trae/mcp.json）。
+#  opencode   → opencode.json（键 mcp、server 带 type）。
+#  kimi       → MCP 是全局 ~/.kimi/mcp.json，不碰 home，给手动指引文件。
+#  guidance   → MCP 是 UI-only（设置面板配、无稳定项目文件），不硬写，给 `MCP-SETUP-<agent>.md` 贴 JSON 指引。
+_AGENTS = {
+    "claude":    {"instruction": "CLAUDE.md", "mcp": "standard"},
+    "codex":     {"instruction": "AGENTS.md", "mcp": "standard"},
+    "gemini":    {"instruction": "GEMINI.md", "mcp": "standard"},
+    "cursor":    {"instruction": ".cursor/rules/seogeo.mdc", "mcp": "standard"},
+    "generic":   {"instruction": "AGENTS.md", "mcp": "standard"},
+    "codebuddy": {"instruction": "CODEBUDDY.md", "mcp": "standard"},  # CODEBUDDY.md 胜过 AGENTS.md
+    "opencode":  {"instruction": "AGENTS.md", "mcp": "opencode"},
+    "kimi":      {"instruction": "AGENTS.md", "mcp": "kimi"},
+    # A1b：rules-dir 指令 + MCP 多为 UI-only。Qoder 原生读根 AGENTS.md（写它省一套）；
+    # Trae 有稳定项目级 .trae/mcp.json；Lingma 的 MCP 跨工程共享、UI-only。
+    "qoder":     {"instruction": "AGENTS.md", "mcp": "guidance"},
+    "trae":      {"instruction": ".trae/rules/project_rules.md", "mcp": "standard",
+                  "mcp_path": ".trae/mcp.json"},
+    "lingma":    {"instruction": ".lingma/rules/seogeo.md", "mcp": "guidance"},
+}
+
+
 def build_agent_bundle(agent: str) -> dict:
-    """生成某 agent 的接入文件包：指令文件 + .mcp.json（写进用户项目，让该 agent 认得 seogeo）。"""
+    """生成某 agent 的接入文件包：指令文件 + MCP 配置（写进用户项目，让该 agent 认得 chinese-geo）。
+
+    MCP 四类：standard 写项目级 MCP 文件（mcpServers，默认 `.mcp.json`，可经 `mcp_path` 改落点，
+    如 Trae 的 `.trae/mcp.json`）；opencode 写 `opencode.json`（键 `mcp`、server 带 `type`）；
+    kimi 的 MCP 是全局 `~/.kimi/mcp.json`——不碰 home，给手动指引 `MCP-SETUP-kimi.md`；
+    guidance 是 UI-only（设置面板配），不硬写其私有路径，给 `MCP-SETUP-<agent>.md` 贴 JSON 指引。
+    """
     key = agent.lower()
-    if key not in _AGENT_INSTRUCTION_FILE:
-        raise ValueError(f"未知 agent：{agent}（支持：{', '.join(_AGENT_INSTRUCTION_FILE)}）")
-    return {_AGENT_INSTRUCTION_FILE[key]: _AGENT_BLURB, ".mcp.json": _AGENT_MCP_JSON}
+    if key not in _AGENTS:
+        raise ValueError(f"未知 agent：{agent}（支持：{', '.join(_AGENTS)}）")
+    spec = _AGENTS[key]
+    bundle = {spec["instruction"]: _AGENT_BLURB}
+    mcp = spec["mcp"]
+    if mcp == "standard":
+        bundle[spec.get("mcp_path", ".mcp.json")] = _AGENT_MCP_JSON
+    elif mcp == "opencode":
+        bundle["opencode.json"] = _OPENCODE_MCP_JSON
+    elif mcp == "kimi":
+        bundle["MCP-SETUP-kimi.md"] = _KIMI_MCP_SETUP
+    elif mcp == "guidance":
+        bundle[f"MCP-SETUP-{key}.md"] = _ui_mcp_setup(key)
+    return bundle
 
 
 def write_bundle(bundle: dict, output_dir: str) -> list:

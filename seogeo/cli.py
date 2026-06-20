@@ -6,7 +6,7 @@
   chinese-geo schema gen <organization|article|faqpage|breadcrumb>
   chinese-geo llms gen [--title <站点名>] [--summary <一句话简介>]
   chinese-geo init [--site <站点名>] [--sitemap <url>] [--output <目录>]      # 生成站点产物
-  chinese-geo init --agent <claude|codex|gemini|cursor|generic> [--output .] # 接入某 agent
+  chinese-geo init --agent <claude|codex|gemini|cursor|generic|codebuddy|kimi|opencode|qoder|trae|lingma> [--output .] # 接入某 agent
   chinese-geo monitor prompts --industry <行业/品类>
   chinese-geo monitor run --industry <X> --brand <品牌> [--engines deepseek,openai] [--aliases a,b] [--competitors A,B]
   chinese-geo monitor score --answers <file.json> --brand <品牌> [--aliases a,b] [--competitors A,B]
@@ -37,7 +37,7 @@ _USAGE = (
     "  chinese-geo schema gen <organization|article|faqpage|breadcrumb>\n"
     "  chinese-geo llms gen [--title <站点名>] [--summary <一句话简介>]\n"
     "  chinese-geo init [--site <站点名>] [--sitemap <url>] [--output <目录>]\n"
-    "  chinese-geo init --agent <claude|codex|gemini|cursor|generic> [--output .]\n"
+    "  chinese-geo init --agent <claude|codex|gemini|cursor|generic|codebuddy|kimi|opencode|qoder|trae|lingma> [--output .]\n"
     "  chinese-geo monitor prompts --industry <行业/品类>\n"
     "  chinese-geo monitor run --industry <X> --brand <品牌> [--engines deepseek,openai] [--aliases a,b] [--competitors A,B]\n"
     "  chinese-geo monitor score --answers <file.json> --brand <品牌> [--aliases a,b] [--competitors A,B]\n"
@@ -120,8 +120,12 @@ def _init_agent(agent: str, out_dir: str) -> int:
         print(f"✅ 写入：{p}")
     for p in skipped:
         print(f"⏭ 已存在，跳过（如需可手动并入 chinese-geo 段）：{p}")
-    print(f"\n{agent} 接入完成。支持 MCP 的话 .mcp.json 里的 chinese-geo 服务即可用"
-          "（需 pip install \"Chinese-Geo[mcp]\"）。")
+    # 提示按 MCP 策略分流：引导型（kimi/qoder/lingma）写的是 MCP-SETUP-*.md，需手动；其余写了真配置文件
+    has_guide = any("MCP-SETUP" in os.path.basename(p) for p in wrote + skipped)
+    mcp_note = ("MCP 需手动配置：见写入的 MCP-SETUP-*.md（把其中 JSON 贴进设置面板 / 全局配置）"
+                if has_guide else "MCP 已配好：写入的配置文件里 chinese-geo 服务即可用")
+    print(f"\n{agent} 接入完成。{mcp_note}"
+          "（需 pip install \"Chinese-Geo[mcp]\" 让 chinese-geo-mcp 在 PATH 上）。")
     return 0
 
 

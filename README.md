@@ -73,7 +73,7 @@ Claude Code 一键装成插件（含 6 个技能 + MCP），以及 Codex / Curso
 - [x] 跨 Agent 指令层（`AGENTS.md` + `CLAUDE.md`，覆盖 Codex / opencode / Cursor / Trae / Kimi 等 30+ agent）
 - [x] MCP server（8 工具：audit / bots_gen / schema_gen / llms_gen / monitor_prompts / monitor_run / monitor_score / offsite；可选 `pip install Chinese-Geo[mcp]`，跑 `chinese-geo-mcp`）
 - [x] Claude 插件一键装（`.claude-plugin/` plugin.json + marketplace + 根 `.mcp.json`）→ 见 [INSTALL.md](INSTALL.md)
-- [x] 跨 agent 一键接入：`chinese-geo init --agent <claude|codex|gemini|cursor|generic>`（写指令文件 + `.mcp.json`，不覆盖已有）
+- [x] 跨 agent 一键接入：`chinese-geo init --agent <claude|codex|gemini|cursor|generic|codebuddy|kimi|opencode|qoder|trae|lingma>`（写指令文件 + MCP 配置/指引，不覆盖已有）
 - [x] Claude 斜杠命令（`/chinese-geo:audit` `/chinese-geo:monitor`，直接跑 CLI 注入结果）
 - [x] CI（GitHub Actions 跑 Python 3.9–3.12 测试）+ 打 GitHub Release 自动发 PyPI
 - [x] 引用率 / SoV 监控（零 key 手动抽样，中文友好，真 SoV）：`chinese-geo monitor` + seogeo-monitor Skill

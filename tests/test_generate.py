@@ -174,3 +174,62 @@ def test_agent_bundle_instruction_is_neutral_terminology():
 def test_agent_bundle_unknown_raises():
     with pytest.raises(ValueError):
         build_agent_bundle("nonsense")
+
+
+# ---- A1: 国内 / 开源 agent（CodeBuddy / Kimi / opencode）----
+
+def test_agent_bundle_codebuddy_uses_own_instruction_and_standard_mcp():
+    import json
+    b = build_agent_bundle("codebuddy")
+    assert "CODEBUDDY.md" in b                          # CodeBuddy 专属指令文件
+    assert "mcpServers" in json.loads(b[".mcp.json"])   # 项目级 .mcp.json（mcpServers）
+
+
+def test_agent_bundle_opencode_uses_opencode_json_with_mcp_key_and_type():
+    import json
+    b = build_agent_bundle("opencode")
+    assert "AGENTS.md" in b
+    cfg = json.loads(b["opencode.json"])
+    assert "mcp" in cfg and "mcpServers" not in cfg      # opencode 用 mcp，不是 mcpServers
+    assert cfg["mcp"]["chinese-geo"]["type"] == "local"  # 每个 server 必须带 type
+
+
+def test_agent_bundle_kimi_gives_manual_mcp_guide_not_home_path():
+    b = build_agent_bundle("kimi")
+    assert "AGENTS.md" in b                              # 指令走事实标准 AGENTS.md
+    assert any("MCP-SETUP" in name for name in b)        # 全局 MCP → 手动指引文件
+    assert not any(name.startswith(("/", "~")) for name in b)  # 绝不写 home / 绝对路径
+
+
+# ---- A1b: rules-dir 指令 + UI-only MCP（Qoder / Trae / Lingma）----
+
+def test_agent_bundle_qoder_writes_root_agents_and_ui_mcp_guide():
+    b = build_agent_bundle("qoder")
+    assert "AGENTS.md" in b                              # Qoder 原生读根 AGENTS.md，写它省一套
+    assert "MCP-SETUP-qoder.md" in b                     # MCP 是 UI-only → 手动贴 JSON 指引
+    assert ".mcp.json" not in b                          # 不自动写 MCP 文件
+    assert not any(name.startswith(("/", "~")) for name in b)  # 不碰 app 私有/绝对路径
+
+
+def test_agent_bundle_trae_uses_rules_dir_and_own_mcp_path():
+    import json
+    b = build_agent_bundle("trae")
+    assert ".trae/rules/project_rules.md" in b           # Trae 指令落点（rules-dir）
+    assert ".trae/mcp.json" in b                         # Trae 有稳定项目级 MCP 文件
+    assert ".mcp.json" not in b                          # 不是根 .mcp.json
+    assert "mcpServers" in json.loads(b[".trae/mcp.json"])  # 键是 mcpServers
+
+
+def test_agent_bundle_lingma_uses_rules_dir_and_ui_mcp_guide():
+    b = build_agent_bundle("lingma")
+    assert ".lingma/rules/seogeo.md" in b                # Lingma rules-dir 指令
+    assert "MCP-SETUP-lingma.md" in b                    # UI-only（跨工程共享）→ 手动贴 JSON
+    assert ".mcp.json" not in b
+
+
+def test_agent_bundle_ui_mcp_guide_has_pasteable_mcpservers_json():
+    import json
+    import re
+    guide = build_agent_bundle("qoder")["MCP-SETUP-qoder.md"]
+    block = re.search(r"```json\n(.*?)\n```", guide, re.S).group(1)  # 指引里要有可直接贴的 JSON
+    assert "chinese-geo" in json.loads(block)["mcpServers"]

@@ -11,7 +11,7 @@
 - `chinese-geo bots verify <ip> <bot>` —— 反向 DNS 校验爬虫 IP 真伪。
 - `chinese-geo schema gen <type>` —— JSON-LD 脚手架（organization / article / faqpage / breadcrumb）。
 - `chinese-geo llms gen [--title <X>] [--summary <Y>]` —— llms.txt 脚手架（主要面向海外引擎；国内基本不读）。
-- `chinese-geo init [--site <X>] [--sitemap <url>]` —— 站点产物（robots + llms.txt + schema + canonical 清单）；`chinese-geo init --agent <claude|codex|gemini|cursor|generic>` —— 把 chinese-geo 接入某 agent（写指令文件 + .mcp.json，不覆盖已有）。
+- `chinese-geo init [--site <X>] [--sitemap <url>]` —— 站点产物（robots + llms.txt + schema + canonical 清单）；`chinese-geo init --agent <claude|codex|gemini|cursor|generic|codebuddy|kimi|opencode|qoder|trae|lingma>` —— 把 chinese-geo 接入某 agent（写指令文件 + MCP 配置或手动指引，不覆盖已有）。
 - `chinese-geo monitor prompts --industry <X>` ｜ `monitor score --answers <f.json> --brand <X>`（零 key 手动）｜ `monitor run --industry <X> --brand <X>`（BYOK 自带 key 自动跑各引擎）—— 引用率 / SoV。
 - `chinese-geo offsite [--engine <豆包|元宝|文心|通义|DeepSeek|Kimi>] [--audience b2b|consumer]` —— 国内社媒/站外平台矩阵（按引擎×受众×开放/封闭 + 一题多发），差异化核心。
 

@@ -39,7 +39,7 @@ pip install -e ".[mcp]"     # 想用 MCP 再加（得到 `chinese-geo-mcp`）
 - **支持 Agent Skills 的**（Codex / CodeBuddy / Kimi 等）：`skills/*/SKILL.md` 是 vendor-neutral 纯 Markdown，放进该 agent 的 skills 目录即可。
 - **都不支持的**（如 Cursor）：直接 `chinese-geo <命令>` 命令行也能拿到约 80% 价值。
 
-> **懒人快捷**：在你的项目根跑 `chinese-geo init --agent <claude|codex|gemini|cursor|generic>`，自动写好该 agent 的指令文件（`CLAUDE.md` / `AGENTS.md` / `GEMINI.md` / `.cursor/rules/seogeo.mdc`）+ `.mcp.json`；已存在的文件不会被覆盖。
+> **懒人快捷**：在你的项目根跑 `chinese-geo init --agent <claude|codex|gemini|cursor|generic|codebuddy|kimi|opencode|qoder|trae|lingma>`，自动写好该 agent 的指令文件（如 `CLAUDE.md` / `AGENTS.md` / `CODEBUDDY.md` / `.cursor/rules/seogeo.mdc` / `.trae/rules/project_rules.md`）+ 对应 MCP 配置（`.mcp.json` / `opencode.json` / `.trae/mcp.json`）或手动接入指引（UI-only 的 Qoder/Lingma、全局的 Kimi 给 `MCP-SETUP-*.md`）；已存在的文件不会被覆盖。
 
 ## 分层一览
 
