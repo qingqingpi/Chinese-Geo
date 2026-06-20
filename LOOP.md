@@ -77,7 +77,7 @@
 - [ ] C2. **quickstart 打磨**：README"快速开始"做到 clone→一条命令→看到结果；把 `chinese-geo demo` 放到首屏。
 - [ ] C3. **文档同步过一遍**：INSTALL/AGENTS/README 与 A/B 的新能力对齐。
 
-### Track D —— 收尾增强（低优先）
+### Track D —— 收尾增强（选做 / 低优；必修＝A/B/C，C 清完即"必修完成"，D 视情况做或留人，别耗）
 - [ ] D1. audit 加规则：图片 alt 缺失检查（`rules/img_alt.py` + 测试）。
 - [ ] D2. audit 加规则：答案胶囊字数软提示（只 warn、注明"经验范围非硬标准"）。
 - [ ] D3. structure 确定性背书：把"答案胶囊字数/FAQ/表格存在"下沉成 CLI 能力，structure SKILL 回调。
@@ -88,7 +88,7 @@
 ---
 
 ## 需要人来做（不在 loop 范围，loop 只备好模板/清单）
-- **发 0.3.0 Release**（gh 创建 / 网页 Draft → 触发 publish.yml 发 PyPI）；任何 push / 发版。
+- **发版策略（2026-06-20 用户定）**：① `0.3.0`（改名）随时单发、修好 `/plugin install`（急、独立）；② **必修（A/B/C）做完后**，把累积的本地提交一次性合进 main → bump 一个新版（以功能为主 → 约 `0.4.0`）→ 发**一个**版，**不按项零碎发**。push / 发版都是人按 button（gh 创建 / 网页 Draft → publish.yml 发 PyPI）；loop 跑到底我只把东西备齐 + 留绿 + 发"可发版"信号。**Track 边界复审时不催发版**，只在必修（A/B/C）全清后提醒（D 选做、不挡发版）。
 - 在真实 **Codex / CodeBuddy / Qoder / Kimi / opencode** 里实跑一遍，按 `docs/verify/VERIFY-<name>.md` 勾选、贴 transcript/截图。
 - 真实站点案例：把生成的修复**应用到你自己的站** → 等收录 → 用**真 API key** 跑 `monitor` 拿引用率/SoV 前后对比 → 填进 `docs/case-study/`。
 - 把本地 loop 提交 push / 开 PR 合进 main（reconcile 已完成、命名已是 chinese-geo）。
