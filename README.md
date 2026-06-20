@@ -24,14 +24,21 @@
 
 ## 🚀 快速开始
 
-需要 Python 3.9+，无需任何第三方包。
+需要 Python 3.9+，无需任何第三方包。**clone → 装 → 一条命令看到结果：**
 
 ```bash
 git clone https://github.com/qingqingpi/Chinese-Geo
 cd Chinese-Geo
 pip install -e .
 
-chinese-geo demo                               # 零 key 自证：内置差站 体检→修复→复检 前后分对比
+chinese-geo demo                               # ← 先跑这条
+```
+
+`chinese-geo demo` 零 key、零网络，当场把一个内置差站从 **33/100 修到 100/100**（用工具自己的生成器补 H1 / JSON-LD / OG / 正文 + 放行国内爬虫，体检 → 修复 → 复检 全跑一遍）——这就是最小自证。没装也能跑：`python -m seogeo.cli demo`。
+
+**接着体检你自己的站**，生成 robots / schema、监控引用率：
+
+```bash
 chinese-geo audit example.com                  # 体检：中文报告
 chinese-geo audit example.com --format json    # 体检：JSON（给 agent / CI）
 chinese-geo bots gen --sitemap https://example.com/sitemap.xml   # 生成推荐 robots.txt（国内各家单独成块）
@@ -42,7 +49,7 @@ chinese-geo init --site "示例科技"               # 一键打包 robots+llms+
 chinese-geo monitor prompts --industry "智能客服"     # 生成去品牌化问题（粘进各 AI 引擎收集回答）
 ```
 
-免安装直接跑：`python -m seogeo.cli audit example.com`
+更多示例（差站 fixture + quickstart 脚本 + 真实样例报告）见 **[examples/](examples/)**。
 
 Claude Code 一键装成插件（含 6 个技能 + MCP），以及 Codex / Cursor 等其它 agent 的集成方式，见 **[INSTALL.md](INSTALL.md)**。
 

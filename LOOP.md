@@ -74,7 +74,7 @@
 
 ### Track C —— 产品化（开发者级）
 - [x] C1. **`examples/` 目录**：fixture 站（一个"差站"+ 期望改进点）、一条 quickstart 脚本、真实样例报告（B3）。 ✅ 完成：`examples/bad-site.html`（故意做差的反面教材，`run_audit` 实测 **52/100**、报 content/structure/discovery 必修项）+ `examples/quickstart.sh`（跑刚 clone 的源码 `demo`，零网络实测 33→100）+ `examples/README.md`（期望改进点表 + 指 `sample-report.md`）；`test_examples.py` 6 项钉"源码层缺要件 + 真实低分"防漂移（差站偷偷改好会变红）；326 测试。
-- [ ] C2. **quickstart 打磨**：README"快速开始"做到 clone→一条命令→看到结果；把 `chinese-geo demo` 放到首屏。
+- [x] C2. **quickstart 打磨**：README"快速开始"做到 clone→一条命令→看到结果；把 `chinese-geo demo` 放到首屏。 ✅ 完成：「快速开始」重构成两段——首屏 hero 把 `chinese-geo demo` 单独成块（clone→装→一条命令），配真实 **33/100 → 100/100** 说明（数字取自 `run_demo()`、`test_readme_quickstart.py` 钉死防手写假数字）+ 没装也能跑提示；其余命令降到「接着体检你自己的站」第二块；尾部加指向 `examples/` 目录链接。`test_readme_quickstart.py` 4 项（clone+install / demo 在 audit 前 / demo 数字=实测 / examples 链接）；330 测试。
 - [ ] C3. **文档同步过一遍**：INSTALL/AGENTS/README 与 A/B 的新能力对齐。
 
 ### Track D —— 收尾增强（选做 / 低优；必修＝A/B/C，C 清完即"必修完成"，D 视情况做或留人，别耗）
