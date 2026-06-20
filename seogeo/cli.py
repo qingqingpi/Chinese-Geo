@@ -19,6 +19,7 @@ import os
 import sys
 
 from seogeo.botverify import verify_bot_ip
+from seogeo.demo import render_demo
 from seogeo.engines import available_engines, run_matrix
 from seogeo.generate import (
     build_agent_bundle, build_init_bundle, generate_llms, generate_robots,
@@ -41,7 +42,8 @@ _USAGE = (
     "  chinese-geo monitor prompts --industry <行业/品类>\n"
     "  chinese-geo monitor run --industry <X> --brand <品牌> [--engines deepseek,openai] [--aliases a,b] [--competitors A,B]\n"
     "  chinese-geo monitor score --answers <file.json> --brand <品牌> [--aliases a,b] [--competitors A,B]\n"
-    "  chinese-geo offsite [--engine <豆包|元宝|文心|通义|DeepSeek|Kimi>] [--audience b2b|consumer]"
+    "  chinese-geo offsite [--engine <豆包|元宝|文心|通义|DeepSeek|Kimi>] [--audience b2b|consumer]\n"
+    "  chinese-geo demo                                  # 内置 fixture 站：体检→修复→复检，前后分数对比（零 key 自证）"
 )
 
 
@@ -237,12 +239,17 @@ def _cmd_offsite(args: list) -> int:
     return 0
 
 
+def _cmd_demo(args: list) -> int:
+    print(render_demo())
+    return 0
+
+
 def main(argv: list | None = None) -> int:
     argv = argv if argv is not None else sys.argv[1:]
     cmd = argv[0] if argv else ""
     dispatch = {"audit": _cmd_audit, "bots": _cmd_bots, "schema": _cmd_schema,
                 "llms": _cmd_llms, "init": _cmd_init, "monitor": _cmd_monitor,
-                "offsite": _cmd_offsite}
+                "offsite": _cmd_offsite, "demo": _cmd_demo}
     if cmd in dispatch:
         return dispatch[cmd](argv[1:])
     print(_USAGE)

@@ -30,3 +30,11 @@ def test_init_agent_standard_message_says_mcp_ready(tmp_path, capsys):
     code = main(["init", "--agent", "claude", "--output", str(tmp_path)])
     assert code == 0
     assert "已配好" in capsys.readouterr().out
+
+
+def test_demo_prints_before_after_comparison(capsys):
+    # `chinese-geo demo`：内置 fixture 站前后分数对比（零 key、零网络）
+    code = main(["demo"])
+    assert code == 0
+    out = capsys.readouterr().out
+    assert "修复前" in out and "修复后" in out

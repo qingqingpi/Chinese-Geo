@@ -1,7 +1,5 @@
 # LOOP.md — Chinese-Geo 自动推进循环
 
-> ⏸️ **暂停待 review（Track A 收尾，2026-06-20）**：Track A（A1/A1b/A2/A3/A4）已全 `[x]`，按分轨复审闸**停在此**。**任何 loop 迭代（含定时器自动触发）读到本横幅：先停、只输出"Track A 已完成、待 review"，别进 Track B。** 用户明确要续 Track B 时删掉本横幅再继续。
-
 > 给 AI 编程 Agent（Claude Code 等）用：一轮一轮把下面的 BACKLOG 做完。
 > 配套读 `AGENTS.md`（项目是什么、CLI/Skill 清单、开发约定）。本文件只管"重心、怎么循环、做什么、不许做什么"。
 > **命令名＝`chinese-geo`**（2026-06-20 改名，内部 Python 模块仍 `seogeo`，`python -m seogeo.cli ...` 不变）。
@@ -69,7 +67,7 @@
 - [x] A4. **跨 agent 接入冒烟测试**：临时目录里验证 `init --agent <X>` 产出正确指令文件 + 正确 MCP 键名/路径、不覆盖已有（零网络）。 ✅ 完成：`test_init_agent_smoke.py`——经 CLI `main` 在临时目录实跑 11 agent 的 `init --agent`，验落点齐全 + opencode `mcp`/`type` 特判 + 标准 `chinese-geo`/`chinese-geo-mcp` 键 + Trae 落 `.trae/mcp.json` + guidance 写 `MCP-SETUP-*.md` + 不覆盖已有 + 未知 agent 报错；零网络；305 测试。
 
 ### Track B —— 可证明的结果（真实站点案例 harness）
-- [ ] B1. **`chinese-geo demo` 命令**：对内置 fixture 站跑通"体检→生成修复→（对 fixture）应用→复检"，打印**前后分数对比**；零 key、可复现，作为最小自证。
+- [x] B1. **`chinese-geo demo` 命令**：对内置 fixture 站跑通"体检→生成修复→（对 fixture）应用→复检"，打印**前后分数对比**；零 key、可复现，作为最小自证。 ✅ 完成：`seogeo/demo.py`——用 chinese-geo 自己的生成器（generate_schema/robots）把差站修成好站，run_audit 前后对比实测 **33→100（Δ+67）**、必修项 4→0；`chinese-geo demo` 打印分项前后表；零网络、可复现；`test_demo.py` 5 项（含确定性）+ cli 1 项；311 测试。
 - [ ] B2. **真实站点案例研究模板** `docs/case-study/TEMPLATE.md`：固定字段 + 采集 schema(JSON) + monitor prompt 矩阵步骤。**⏳ 真实数据人来填**。
 - [ ] B3. **提交一份真实样例 audit 报告** `examples/sample-report.md`：loop 跑 `chinese-geo audit <真实公开站>` 抓**真实**输出落盘。
 - [ ] B4. **README 示例输出换成真实的**：用 B3 的真实输出替换 README 里手写的假样例（诚实化）。

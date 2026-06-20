@@ -31,6 +31,7 @@ git clone https://github.com/qingqingpi/Chinese-Geo
 cd Chinese-Geo
 pip install -e .
 
+chinese-geo demo                               # 零 key 自证：内置差站 体检→修复→复检 前后分对比
 chinese-geo audit example.com                  # 体检：中文报告
 chinese-geo audit example.com --format json    # 体检：JSON（给 agent / CI）
 chinese-geo bots gen --sitemap https://example.com/sitemap.xml   # 生成推荐 robots.txt（国内各家单独成块）
