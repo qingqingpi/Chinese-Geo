@@ -43,7 +43,7 @@ description: 当用户想检查或优化自己网站在 AI 引擎里的可见性
 | DeepSeek / Kimi | 公网媒体 + 知乎 / CSDN |
 | ChatGPT / Perplexity / Claude / Google AI | Wikipedia / Reddit / 权威媒体 |
 
-### 手法 → AI 可见度提升（Princeton GEO 等研究；方向可信、数值仅参考）
+### 手法 → AI 可见度提升（Princeton 等 GEO 论文的**模拟引擎**实验，非真实 AI 搜索；方向可信、数值仅参考）
 加引用来源 +27~115% ｜ 加统计数字 +33~37% ｜ 加专家引文 +28~41% ｜ 提升流畅度 +15~30% ｜ 权威语气 +16~25% ｜ 结论前置 +25% ｜ 关键词堆砌 −10%（有害，别做）。
 
 ## 诚实边界（务必如实告知用户）

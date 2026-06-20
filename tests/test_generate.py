@@ -19,7 +19,7 @@ from seogeo.generate import (
 
 def test_robots_separate_block_per_domestic_bot():
     out = generate_robots()
-    # 每个国内爬虫各自单独成块（合并进 * 会被忽略）
+    # 每个国内爬虫各自单独成块（对 Bytespider/搜狗 是保险做法）
     assert "User-agent: Baiduspider\nAllow: /" in out
     assert "User-agent: Bytespider\nAllow: /" in out
     assert "User-agent: Sogou web spider\nAllow: /" in out

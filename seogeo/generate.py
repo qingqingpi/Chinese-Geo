@@ -1,6 +1,6 @@
 """生成器：把诊断变成可复制的修复产物（确定性、零依赖）。
 
-- generate_robots：推荐 robots.txt——国内爬虫"各家单独成块"（差异化核心；合并进 * 可能被忽略），
+- generate_robots：推荐 robots.txt——国内爬虫"各家单独成块"（对 Bytespider/搜狗 是保险做法；合并组被无视仅这两家有站长报告），
   海外爬虫遵守通配可合并成一块。
 - generate_schema：JSON-LD 脚手架（schema.org），带占位符，复制进 <head> 改改即用。
 """
@@ -21,7 +21,7 @@ def generate_robots(allow_domestic: bool = True, allow_overseas: bool = True,
         "",
     ]
     if allow_domestic:
-        lines.append("# 国内 AI 爬虫——各家单独成块（合并进 * 可能被忽略）")
+        lines.append("# 国内 AI 爬虫——各家单独成块（对 Bytespider/搜狗 是保险做法）")
         for bot in DOMESTIC_BOTS:
             lines += [f"User-agent: {bot}", "Allow: /", ""]
     if allow_overseas:
@@ -52,7 +52,7 @@ _SCHEMA_TEMPLATES = {
         "@context": "https://schema.org", "@type": "FAQPage",
         "mainEntity": [{
             "@type": "Question", "name": "<问题>",
-            "acceptedAnswer": {"@type": "Answer", "text": "<答案，40–75 字直接作答>"},
+            "acceptedAnswer": {"@type": "Answer", "text": "<答案，简明直接作答>"},
         }],
     },
     "breadcrumb": {
@@ -109,7 +109,7 @@ def generate_llms(title: str, summary: str | None = None,
 _CANONICAL_CHECKLIST = """\
 # canonical / meta 逐页自查清单（seogeo 生成）
 
-每页都过一遍——这些是 AI 爬虫"看懂并愿意引用"的技术底线。
+每页都过一遍——这些是 AI 爬虫"看懂并更易引用"的技术底线。
 
 ## 每页必备
 - [ ] `<html lang="zh-CN">`：声明语言，避免被当成乱码或误判地区
@@ -169,7 +169,7 @@ Perplexity / Google AI）AI 引擎抓取与引用。做 AI 可见性 / GEO / SEO
 - `seogeo monitor prompts｜run｜score` —— 引用率 / SoV（零 key 手动 + BYOK 自动）。
 
 ## 关键 know-how
-- 国内爬虫各家须单独成块（合并进 `*` 会被忽略）；Bytespider 不守 robots，要服务端硬拦。
+- 国内爬虫各家单独成块（对 Bytespider/搜狗 是保险做法）；Bytespider 不完全守 robots，要服务端硬拦。
 - 每家 AI 主要"吃自己生态"：豆包←抖音/头条、元宝←公众号、文心←百度百科/百家号、DeepSeek/Kimi←知乎/CSDN。
 - llms.txt 国内基本无效；GEO 主战场是联网检索。
 

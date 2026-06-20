@@ -14,7 +14,7 @@ OVERSEAS_BOTS = {
     "Perplexity-User": "Perplexity（用户触发抓取）",
     "Google-Extended": "Google（Gemini / AI Overviews 训练令牌）",
     "CCBot": "Common Crawl（被多家 AI 训练采用）",
-    "Bingbot": "Microsoft（Copilot / ChatGPT 经 Bing）",
+    "Bingbot": "Microsoft Bing / Copilot",
     "Applebot-Extended": "Apple（AI 训练）",
     "Meta-ExternalAgent": "Meta AI（训练）",
     "Amazonbot": "Amazon",

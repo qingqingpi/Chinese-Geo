@@ -1,7 +1,7 @@
 # Chinese-Geo
 
 > 中文 / 国内生态优先的开源 **SEO + GEO（生成式引擎优化）** 工具包。
-> 让你的网站被**豆包 / DeepSeek / 文心一言 / 通义千问 / 腾讯元宝 / Kimi** 等国内 AI 引擎**抓得到、看得懂、愿意引用**。
+> 让你的网站被**豆包 / DeepSeek / 文心一言 / 通义千问 / 腾讯元宝 / Kimi** 等国内 AI 引擎**抓得到、看得懂、更可能被引用**。
 > **国内生态是差异化核心，海外主流（ChatGPT / Claude / Perplexity / Google AI）一并覆盖——两个生态，一个工具。**
 
 现有 SEO/GEO 工具几乎全是英文 / 海外生态视角（只盯 ChatGPT / Perplexity，只认 Wikipedia / llms.txt）。**Chinese-Geo 把国内这一套补全，同时不丢海外主流**：国内爬虫准入、百度系结构化、知乎 / CSDN / 公众号站外矩阵、国产引擎引用监控——这是海外工具的空白。
@@ -12,7 +12,7 @@
 
 一条命令，给你的站做 **AI 可见性体检**：7 个维度打分 + 中文优先级修复清单。
 
-- **★ 国内 AI 爬虫准入** —— robots.txt 是否放行 Baiduspider / Bytespider / PetalBot / Sogou / YisouSpider，并按"**各家须单独成块、合并进 `*` 通配会被忽略**"的真实规则判定。还会探测 **Bytespider 是否真被服务端硬拦**（它不守 robots，robots 挡了≠真挡住），并支持**反向 DNS 校验爬虫 IP 真伪**。**别的工具没有这些。**
+- **★ 国内 AI 爬虫准入** —— robots.txt 是否放行 Baiduspider / Bytespider / PetalBot / Sogou / YisouSpider。重点查 **Bytespider / 搜狗**：有站长报告它们被合并进 `*` 或多 UA 堆叠组时仍照爬、单独成块后才停（社区经验、非官方），所以这两家仅靠 `*` 放行会提醒；其余几家按 RFC 9309 遵守 `*`、不扣分。还会探测 **Bytespider 是否真被服务端硬拦**（它不完全遵守 robots，robots 挡了≠真挡住），并支持**反向 DNS 校验爬虫 IP 真伪**——这些海外工具普遍没覆盖。
 - **海外 AI 爬虫准入** —— GPTBot / ClaudeBot / PerplexityBot / Google-Extended 等是否被挡（海外爬虫遵守 `*` 通配，判定规则与国内不同）。
 - **AI 可发现性** —— sitemap.xml（百度 / 搜狗提交友好）。
 - **结构化数据** —— JSON-LD 存在性与合法性 + Open Graph 标签。
@@ -53,7 +53,7 @@ Claude Code 一键装成插件（含 6 个技能 + MCP），以及 Codex / Curso
 
 ## 优先级修复清单
 ### 🔴 必须修
-- [+20分 · ★国内 AI 爬虫准入] 为 Bytespider, PetalBot 各自单独写 User-agent 块并 Allow: /（合并进 * 通配段会被忽略）
+- [+20分 · ★国内 AI 爬虫准入] robots.txt 挡住了国内 AI 爬虫：Bytespider——各自单独写 User-agent 块并 Allow: /（Bytespider 不完全遵守 robots，必要时还需服务端 / WAF 硬拦）
 - [+16分 · 内容可引用性] 补强：唯一 H1 主标题、H2 小节切分、正文≥300字、列表/表格
 - [+16分 · 结构化] 添加 Organization / Article / FAQPage 等 JSON-LD
 ```

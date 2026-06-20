@@ -27,13 +27,13 @@ seogeo 押注的"能证明的赢面"：
 退出标准：重跑 audit，`domestic` / `structure` 项转绿。
 
 ### 阶段 3 · 结构（委派 `seogeo-structure`）
-答案胶囊 40–75 字、问答式小标题、表格 / listicle、FAQ + schema 对齐。退出标准：`content` / `structure` 维度回升。
+答案胶囊（小节开头一两句话先把结论说完）、问答式小标题、表格 / listicle、FAQ + schema 对齐。退出标准：`content` / `structure` 维度回升。
 
 ### 阶段 4 · 内容（委派 `seogeo-content`）
 结论前置、加统计 / 引文 / 出处、TL;DR、新鲜度。**诚实提醒用户：纯文案手法边际收益随竞争下降，别过度承诺；这步是锦上添花，不是地基。**
 
 ### 阶段 5 · 站外 + 实体（委派 `seogeo-offsite`）
-按目标引擎选平台（豆包←抖音 / 头条、元宝←公众号、文心←百度百科 / 百家号、DeepSeek / Kimi←知乎 / CSDN）；一题多发；百科 / sameAs / NAP 立实体。**AI 回答约 91% 来自第三方站——这步往往比站内更关键。**
+按目标引擎选平台（豆包←抖音 / 头条、元宝←公众号、文心←百度百科 / 百家号、DeepSeek / Kimi←知乎 / CSDN）；一题多发；百科 / sameAs / NAP 立实体。**AI 联网回答大量引用第三方平台而非品牌官网，所以这步常比站内更关键**（具体比例随行业 / 引擎波动，无统一权威数字）。
 
 ### 阶段 6 · 监控验证（委派 `seogeo-monitor`）
 `seogeo monitor prompts` 生成去品牌化问题 →（零 key 手动粘 / BYOK `monitor run` 自动）→ `monitor score` 算引用率 + SoV。基准 <10% 差 / 10–30% 良 / >30% 优。**按月重测**，回推前几阶段该补哪。

@@ -3,7 +3,8 @@
 纯 stdlib、零依赖。语义移植自 Auriti `utils/robots_parser.py`（RFC 9309 子集）：
 - 连续的 `User-agent:` 行共享同一组规则；规则行出现后，下一个 `User-agent:` 开启新组。
 - `classify_bot` 既判 allowed/blocked，也分辨命中的是"显式 UA 块"还是"仅靠 * 通配"
-  （via_wildcard）——因为百度/字节等倾向只读精确匹配自己 UA 的块（见 CLAUDE.md）。
+  （via_wildcard）——Bytespider / 搜狗 对仅靠 * 覆盖的合规度有争议（站长报告、非官方），
+  上层规则据此决定是否提醒；其余爬虫按 RFC 9309 遵守 *。
 
 v0 路径匹配用最常见的前缀语义（暂不支持 `*`/`$` 通配），足够回答"根路径能否被抓"。
 """

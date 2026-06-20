@@ -1,7 +1,7 @@
 """robots.txt 解析与按 UA 分类——国内 AI 爬虫准入检查的地基。
 
-关键语义（CLAUDE.md / research/02）：百度、字节等爬虫倾向只读"精确匹配自己 UA
-的块"，被合并进 `*` 通配段的规则可能被忽略。所以 classify_bot 既要判 allowed/blocked，
+关键语义：Bytespider / 搜狗 对仅靠 `*` 覆盖的合规度有争议（站长报告、非官方，最早见
+feitsui.com 2020），其余按 RFC 9309 遵守 `*`。所以 classify_bot 既要判 allowed/blocked，
 也要分辨命中的是"显式 UA 块"还是"仅靠 * 通配"（via_wildcard）。
 """
 from seogeo.robots import classify_bot

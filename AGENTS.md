@@ -28,7 +28,7 @@
 SKILL.md 是纯 vendor-neutral Markdown，可移植到任何支持 Agent Skills 的 runtime；不支持的 agent，直接调上面的 CLI 也能拿到主要价值。
 
 ## 关键 know-how（落地用）
-- 国内爬虫（Baiduspider / Bytespider / PetalBot / Sogou / YisouSpider）倾向只读精确匹配自己 UA 的块——robots 里各家须单独成块，合并进 `*` 会被忽略。
+- 国内爬虫准入：按 RFC 9309，`*` 是标准 catch-all，Baiduspider / PetalBot / 神马 通常遵守；仅 Bytespider / 搜狗 有"合并组被无视、单独成块才停"的站长报告（n=1、非官方）。生成 robots 时各家单独成块属保险做法。
 - Bytespider 不守 robots——robots 挡了 ≠ 真挡住，要服务端 / WAF 硬拦。
 - 每家 AI 主要"吃自己生态"：豆包 ← 抖音 / 头条、元宝 ← 公众号、文心 ← 百度百科 / 百家号、通义 ← 门户自媒体、DeepSeek / Kimi ← 知乎 / CSDN。
 - llms.txt 国内基本无效；GEO 主战场是联网检索。
