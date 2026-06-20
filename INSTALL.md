@@ -13,7 +13,7 @@ pip install -e .            # 得到 `chinese-geo` 命令（纯标准库）
 pip install -e ".[mcp]"     # 想用 MCP 再加（得到 `chinese-geo-mcp`）
 ```
 
-装完，任何 agent 都能直接 shell 调：`chinese-geo audit example.com`。
+装完先跑 `chinese-geo demo` 自证（零 key、零网络，看内置差站「体检 → 修复 → 复检」的前后分数对比）；之后任何 agent 都能直接 shell 调，例如 `chinese-geo audit example.com`。更多开发者级样例（差站 fixture + quickstart 脚本 + 真实样例报告）见 [`examples/`](examples/)。
 
 ## 第 2 步：各 agent 原生集成（可选）
 

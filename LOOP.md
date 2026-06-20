@@ -4,6 +4,8 @@
 > 配套读 `AGENTS.md`（项目是什么、CLI/Skill 清单、开发约定）。本文件只管"重心、怎么循环、做什么、不许做什么"。
 > **命令名＝`chinese-geo`**（2026-06-20 改名，内部 Python 模块仍 `seogeo`，`python -m seogeo.cli ...` 不变）。
 
+> ⏸️ **暂停待 review（必修 A/B/C 全完，2026-06-21）** —— Track A + B + C 已全部 `[x]`，必修闭环完成、333 测试全绿、本地提交未 push。**loop 在此停**：交回用户 review，不发版（发版＝人按一键按钮）。**别自动进 Track D**（选做 / 低优）。若有遗留计时器误触发本 loop：A/B/C 已无 `[ ]` → 直接停、输出 Track C 小结、等用户明确放行（如"续 Track D"）再动。
+
 ---
 
 ## 这个 loop 的重心（已与用户确认，2026-06-20）★
@@ -75,7 +77,7 @@
 ### Track C —— 产品化（开发者级）
 - [x] C1. **`examples/` 目录**：fixture 站（一个"差站"+ 期望改进点）、一条 quickstart 脚本、真实样例报告（B3）。 ✅ 完成：`examples/bad-site.html`（故意做差的反面教材，`run_audit` 实测 **52/100**、报 content/structure/discovery 必修项）+ `examples/quickstart.sh`（跑刚 clone 的源码 `demo`，零网络实测 33→100）+ `examples/README.md`（期望改进点表 + 指 `sample-report.md`）；`test_examples.py` 6 项钉"源码层缺要件 + 真实低分"防漂移（差站偷偷改好会变红）；326 测试。
 - [x] C2. **quickstart 打磨**：README"快速开始"做到 clone→一条命令→看到结果；把 `chinese-geo demo` 放到首屏。 ✅ 完成：「快速开始」重构成两段——首屏 hero 把 `chinese-geo demo` 单独成块（clone→装→一条命令），配真实 **33/100 → 100/100** 说明（数字取自 `run_demo()`、`test_readme_quickstart.py` 钉死防手写假数字）+ 没装也能跑提示；其余命令降到「接着体检你自己的站」第二块；尾部加指向 `examples/` 目录链接。`test_readme_quickstart.py` 4 项（clone+install / demo 在 audit 前 / demo 数字=实测 / examples 链接）；330 测试。
-- [ ] C3. **文档同步过一遍**：INSTALL/AGENTS/README 与 A/B 的新能力对齐。
+- [x] C3. **文档同步过一遍**：INSTALL/AGENTS/README 与 A/B 的新能力对齐。 ✅ 完成：核对发现三份文档的 init --agent 11-agent 清单已与 `generate.py _AGENTS` 一致、无过时裸 `seogeo <子命令>`（命令名统一 chinese-geo）；唯一真缺口＝INSTALL.md 没提 `chinese-geo demo`（B1 自证）和 `examples/`（C1），已在「第 1 步」补上（装完先跑 demo 自证 + 指向 examples/，不硬编码分数避免无测试的漂移点）。新增 `test_docs_sync.py` 3 项 anti-drift（清单=代码、无过时命令名、INSTALL 覆盖 demo+examples），漏一个就变红。333 测试。
 
 ### Track D —— 收尾增强（选做 / 低优；必修＝A/B/C，C 清完即"必修完成"，D 视情况做或留人，别耗）
 - [ ] D1. audit 加规则：图片 alt 缺失检查（`rules/img_alt.py` + 测试）。
