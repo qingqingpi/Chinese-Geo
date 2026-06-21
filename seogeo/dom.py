@@ -39,7 +39,8 @@ class DomScanner(HTMLParser):
             self._in_title = True
         if tag in self.headings:
             self.headings[tag] += 1
-        if tag == "p" or tag in self.headings:  # 开始捕获该块文本（答案胶囊 / 标题文字）
+        if tag == "p" or tag in self.headings:  # 块开始：先冲掉上一个未闭合块（HTML5 可省略 </p>），再开新块
+            self._flush_cap()
             self._cap_tag = tag
             self._cap_buf = []
         if tag == "link" and a.get("rel", "").lower() == "canonical":
@@ -73,13 +74,7 @@ class DomScanner(HTMLParser):
             self._in_jsonld = False
             self.jsonld_blocks.append("".join(self._jsonld_buf))
         if self._cap_tag and tag == self._cap_tag:
-            text = "".join("".join(self._cap_buf).split())  # 去所有空白 → 非空白字符数（中文友好）
-            if tag == "p":
-                self.paragraph_lengths.append(len(text))
-            else:
-                self.heading_texts.append(text)
-            self._cap_tag = None
-            self._cap_buf = []
+            self._flush_cap()
 
     def handle_data(self, data):
         if self._in_title:
@@ -90,6 +85,18 @@ class DomScanner(HTMLParser):
             self._text_parts.append(data)
         if self._cap_tag and not self._in_skip and not self._in_jsonld:
             self._cap_buf.append(data)
+
+    def _flush_cap(self) -> None:
+        """记录当前捕获块（<p>→字数 / 标题→文本）。供块边界、匹配结束标签、EOF 调用。"""
+        if self._cap_tag is None:
+            return
+        text = "".join("".join(self._cap_buf).split())  # 去所有空白 → 非空白字符数（中文友好）
+        if self._cap_tag == "p":
+            self.paragraph_lengths.append(len(text))
+        else:
+            self.heading_texts.append(text)
+        self._cap_tag = None
+        self._cap_buf = []
 
     @property
     def text(self) -> str:
@@ -109,4 +116,5 @@ class DomScanner(HTMLParser):
 def scan(html: str) -> DomScanner:
     d = DomScanner()
     d.feed(html or "")
+    d._flush_cap()  # 冲掉 EOF 时仍未闭合的块（HTML5 末尾 <p>/<hN> 常省略闭合）
     return d

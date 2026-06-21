@@ -55,3 +55,23 @@ def test_render_md_is_non_scoring_and_honest():
 def test_render_json_roundtrips():
     j = json.loads(render_structure(analyze_structure("<h1>t</h1>"), "json"))
     assert j["headings"]["h1"] == 1
+
+
+# —— code-review #4：块捕获状态机的隐式闭合 / EOF / 边界 ——
+
+def test_capsule_counts_paragraphs_with_implicit_close():
+    # HTML5 允许省略 </p>：<p>a<p>b 两段都要计入（隐式闭合 + EOF 冲洗）
+    html = "<p>" + "正" * 50 + "<p>" + "字" * 60
+    assert analyze_structure(html)["capsule"]["paragraphs"] == 2
+
+
+def test_unclosed_question_heading_at_eof_detected():
+    # 未闭合标题在 EOF 也要记录 → FAQ 问句识别不漏
+    assert analyze_structure("<h2>这是问题吗？")["faq"]["question_headings"] == 1
+
+
+def test_heading_interrupting_paragraph_keeps_both():
+    # 标题打断段落（隐式边界）：段落不该整段丢失，标题也要记到
+    s = analyze_structure("<p>" + "正" * 50 + "<h2>小标题</h2>")
+    assert s["capsule"]["paragraphs"] == 1
+    assert s["headings"]["h2"] == 1
