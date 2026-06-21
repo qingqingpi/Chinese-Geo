@@ -4,7 +4,7 @@
 > 配套读 `AGENTS.md`（项目是什么、CLI/Skill 清单、开发约定）。本文件只管"重心、怎么循环、做什么、不许做什么"。
 > **命令名＝`chinese-geo`**（2026-06-20 改名，内部 Python 模块仍 `seogeo`，`python -m seogeo.cli ...` 不变）。
 
-> ▶️ **Track D 进行中（用户 2026-06-21 明确"继续D"已授权）** —— 必修 A/B/C 全 `[x]`、已交 review。现按用户指令做 Track D（选做增强）+ 收尾后做一次代码审查。loop 改为**用户手动驱动**（不自动 ScheduleWakeup）；若遗留计时器误触发：按 BACKLOG 顶部第一个 `[ ]` 正常推进即可。仍不 push、不发版（发版＝人按一键按钮）。
+> ✅ **全 BACKLOG（A/B/C/D）完成 + 代码审查通过（2026-06-21）** —— A/B/C/D 全 `[x]`。收尾做了一次多角度代码审查（5 个 finder agent 并行 + 跨文件追踪），查出 **4 个真 bug 并全部 TDD 修复**：① Gemini 安全过滤空响应崩掉整个 `monitor run` 矩阵 → 降级空答案；② 首页 404 被误判成空页面假打分 → 当作"抓不到首页"warn；③ `init --agent` 在已有 `.mcp.json` 被跳过时谎称"MCP 已配好" → 改提示手动并入；④ dom 块捕获丢段/丢标题（HTML5 隐式 `</p>`、EOF、标题打断）→ `_flush_cap` 三处冲洗。**381 测试全绿、24 本地提交未 push。** loop 收尾，待用户 review。**剩下全是人的事**：push/PR、发版（一键按钮）、真 agent 实跑、真站案例。loop **不自动 ScheduleWakeup**；若遗留计时器误触发：BACKLOG 已无 `[ ]` → 直接停、报"已全部完成"。
 
 ---
 
