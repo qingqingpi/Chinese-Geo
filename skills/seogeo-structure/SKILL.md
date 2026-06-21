@@ -14,11 +14,16 @@ AI 引用的是"块"，不是整页。把页面拆成自包含、可直接抽取
    chinese-geo audit <域名> --format json
    ```
    未安装命令时用 `python -m seogeo.cli audit <域名> --format json`。重点看 `structure`(JSON-LD) 与 `content`(可引用性) 两项的 `checks` / `recommendation`。
-2. 需要结构化脚手架时：
+2. 拿确定性结构信号（**非评分** advisory，省人肉数）：
+   ```bash
+   chinese-geo structure <域名或URL> --format json
+   ```
+   未安装时 `python -m seogeo.cli structure <URL>`。它把下面清单里能机器判定的部分量出来——段落字数分布（答案胶囊）、FAQ 信号（FAQPage / 问句式小标题）、表格 / 列表存在、H1/H2 计数；据此对照清单判断，省得人肉数。注：答案胶囊字数是经验范围、非硬标准，仅供参考、不计分。
+3. 需要结构化脚手架时：
    ```bash
    chinese-geo schema gen <organization|article|faqpage|breadcrumb>
    ```
-3. 按下面清单逐项重排，再重跑 audit 看对应项转绿。
+4. 按下面清单逐项重排，再重跑 audit 看对应项转绿。
 
 ## 结构检查清单（判断层）
 

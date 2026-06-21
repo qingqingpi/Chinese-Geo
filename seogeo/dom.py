@@ -21,6 +21,10 @@ class DomScanner(HTMLParser):
         self.has_table = False
         self.images = 0
         self.images_missing_alt = 0  # <img> 无 alt 属性（alt="" 是装饰性合法用法，不计入）
+        self.paragraph_lengths: list = []  # 每个 <p> 的非空白字符数（中文友好）→ 答案胶囊字数
+        self.heading_texts: list = []      # 每个 h1-h6 的文本 → FAQ 问句识别
+        self._cap_tag = None               # 当前正在捕获文本的块级标签（p / h1-h6）
+        self._cap_buf: list = []
         self._in_title = False
         self._in_jsonld = False
         self._jsonld_buf: list = []
@@ -35,6 +39,9 @@ class DomScanner(HTMLParser):
             self._in_title = True
         if tag in self.headings:
             self.headings[tag] += 1
+        if tag == "p" or tag in self.headings:  # 开始捕获该块文本（答案胶囊 / 标题文字）
+            self._cap_tag = tag
+            self._cap_buf = []
         if tag == "link" and a.get("rel", "").lower() == "canonical":
             self.canonical = a.get("href", "")
         if tag == "meta":
@@ -65,6 +72,14 @@ class DomScanner(HTMLParser):
         if tag == "script" and self._in_jsonld:
             self._in_jsonld = False
             self.jsonld_blocks.append("".join(self._jsonld_buf))
+        if self._cap_tag and tag == self._cap_tag:
+            text = "".join("".join(self._cap_buf).split())  # 去所有空白 → 非空白字符数（中文友好）
+            if tag == "p":
+                self.paragraph_lengths.append(len(text))
+            else:
+                self.heading_texts.append(text)
+            self._cap_tag = None
+            self._cap_buf = []
 
     def handle_data(self, data):
         if self._in_title:
@@ -73,6 +88,8 @@ class DomScanner(HTMLParser):
             self._jsonld_buf.append(data)
         elif not self._in_skip:
             self._text_parts.append(data)
+        if self._cap_tag and not self._in_skip and not self._in_jsonld:
+            self._cap_buf.append(data)
 
     @property
     def text(self) -> str:

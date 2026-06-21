@@ -81,8 +81,8 @@
 
 ### Track D —— 收尾增强（选做 / 低优；必修＝A/B/C，C 清完即"必修完成"，D 视情况做或留人，别耗）
 - [x] D1. audit 加规则：图片 alt 缺失检查（`rules/img_alt.py` + 测试）。 ✅ 完成：DomScanner 增 `images`/`images_missing_alt`（`alt` 属性缺失才算，`alt=""` 是装饰性合法用法不误伤）；`rules/img_alt.py`（technical 类，weight 6）——无图/全有 alt=pass、有缺=warn 报数量。`test_img_alt.py` 6 项。**注：新增评分规则使归一化基线微移**——demo before 33→**36**、bad-site 52→**54**（无图站 img-alt 满分属实，honest）；已更新 README 静态数字 36；`test_demo`/`test_examples` 用相对/阈值断言不受影响，`test_readme_quickstart` 动态读 `run_demo()` 自适应。339 测试。
-- [ ] D2. audit 加规则：答案胶囊字数软提示（只 warn、注明"经验范围非硬标准"）。
-- [ ] D3. structure 确定性背书：把"答案胶囊字数/FAQ/表格存在"下沉成 CLI 能力，structure SKILL 回调。
+- [x] D2. audit 加规则：答案胶囊字数软提示（只 warn、注明"经验范围非硬标准"）。 ✅ 决策＝**并入 D3**（不作 audit 评分规则）：理由——评分模型 warn=扣半分，与"经验范围非硬标准"自相矛盾，且与 `0cd528b` honesty calibration（胶囊 40–75 字"无定论"）冲突；capsule 字数本就在 D3 范围内。改为 D3 的 `structure` CLI **非评分 advisory**（诚实交付同一意图，不扣分、不污染总分）。
+- [x] D3. structure 确定性背书：把"答案胶囊字数/FAQ/表格存在"下沉成 CLI 能力，structure SKILL 回调。 ✅ 完成（含 D2 意图）：新 `chinese-geo structure <url> [--format md|json]`——确定性、**非评分** advisory：DomScanner 增 `paragraph_lengths`(答案胶囊字数，中文友好非空白计数)+`heading_texts`(FAQ 问句识别)；`structure_signals.py` 出骨架(H1/H2/列表/表格)+FAQ(FAQPage JSON-LD/问句小标题)+答案胶囊字数分布(适中40–150/过长>300，注明经验范围非硬标准)。seogeo-structure SKILL 加"调 structure 拿确定性信号"步骤；AGENTS.md 补命令。`test_structure_signals.py` 7 + `test_cli.py` 4（happy/坏输入/无url，零网络注入）。**纯加法、不进评分→demo/example 分数不变**（349 测试）。
 - [ ] D4. playwright 真渲染接线：`[render]` extra 接进 rendering 规则、填 `rendered_html`，无则降级；可注入零网络测试。
 - [ ] D5. BYOK 引擎补 Gemini 原生 + 文心 Qianfan client（各零网络测试）；元宝无公开 API → 文档标注跳过。
 - [ ] D6. CLI/MCP 胶水单测继续加厚（每子命令/每工具 happy-path + 坏输入不崩）。

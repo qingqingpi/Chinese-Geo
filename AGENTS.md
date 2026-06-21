@@ -14,6 +14,7 @@
 - `chinese-geo init [--site <X>] [--sitemap <url>]` —— 站点产物（robots + llms.txt + schema + canonical 清单）；`chinese-geo init --agent <claude|codex|gemini|cursor|generic|codebuddy|kimi|opencode|qoder|trae|lingma>` —— 把 chinese-geo 接入某 agent（写指令文件 + MCP 配置或手动指引，不覆盖已有）。
 - `chinese-geo monitor prompts --industry <X>` ｜ `monitor score --answers <f.json> --brand <X>`（零 key 手动）｜ `monitor run --industry <X> --brand <X>`（BYOK 自带 key 自动跑各引擎）—— 引用率 / SoV。
 - `chinese-geo offsite [--engine <豆包|元宝|文心|通义|DeepSeek|Kimi>] [--audience b2b|consumer]` —— 国内社媒/站外平台矩阵（按引擎×受众×开放/封闭 + 一题多发），差异化核心。
+- `chinese-geo structure <url> [--format md|json]` —— 确定性结构信号（答案胶囊字数 / FAQ / 表格 / 标题层级），**非评分** advisory，供 seogeo-structure 判断层回调。
 - `chinese-geo demo` —— 内置 fixture 站「体检→修复→复检」前后分数对比（零 key、零网络、可复现的最小自证）。
 
 未安装命令时用 `python -m seogeo.cli ...`（设 `PYTHONPATH=.`）。

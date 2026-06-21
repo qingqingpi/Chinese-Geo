@@ -38,3 +38,23 @@ def test_demo_prints_before_after_comparison(capsys):
     assert code == 0
     out = capsys.readouterr().out
     assert "修复前" in out and "修复后" in out
+
+
+def test_structure_no_url_prints_usage(capsys):
+    assert main(["structure"]) == 2
+    assert "用法" in capsys.readouterr().out
+
+
+def test_structure_happy_path(monkeypatch, capsys):
+    # 零网络：注入 fetch_text → 走 analyze + render
+    monkeypatch.setattr("seogeo.cli.fetch_text",
+                        lambda url: ("<h1>标题</h1><p>" + "正" * 50 + "</p>", None))
+    assert main(["structure", "example.com"]) == 0
+    assert "结构信号" in capsys.readouterr().out
+
+
+def test_structure_fetch_error_does_not_crash(capsys, monkeypatch):
+    # 抓不到页面 → 友好报错 + 退出码 2，绝不拿空 HTML 当"无结构"误报
+    monkeypatch.setattr("seogeo.cli.fetch_text", lambda url: (None, "timeout"))
+    assert main(["structure", "https://x.com"]) == 2
+    assert "无法获取" in capsys.readouterr().out

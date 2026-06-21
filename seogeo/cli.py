@@ -28,7 +28,8 @@ from seogeo.generate import (
 from seogeo.monitor import generate_prompts, score_answers, verdict
 from seogeo.offsite import cross_post_set, recommend
 from seogeo.report import render_json, render_markdown
-from seogeo.service import audit_url
+from seogeo.service import audit_url, fetch_text
+from seogeo.structure_signals import analyze_structure, render_structure
 
 _USAGE = (
     "用法：\n"
@@ -43,6 +44,7 @@ _USAGE = (
     "  chinese-geo monitor run --industry <X> --brand <品牌> [--engines deepseek,openai] [--aliases a,b] [--competitors A,B]\n"
     "  chinese-geo monitor score --answers <file.json> --brand <品牌> [--aliases a,b] [--competitors A,B]\n"
     "  chinese-geo offsite [--engine <豆包|元宝|文心|通义|DeepSeek|Kimi>] [--audience b2b|consumer]\n"
+    "  chinese-geo structure <域名或URL> [--format md|json]   # 确定性结构信号（答案胶囊字数/FAQ/表格），非评分，供 structure 判断层\n"
     "  chinese-geo demo                                  # 内置 fixture 站：体检→修复→复检，前后分数对比（零 key 自证）"
 )
 
@@ -239,6 +241,21 @@ def _cmd_offsite(args: list) -> int:
     return 0
 
 
+def _cmd_structure(args: list) -> int:
+    if not args or args[0].startswith("-"):  # 缺 URL，或把 --flag 误当 URL
+        print(_USAGE)
+        return 2
+    url = args[0]
+    if not url.startswith(("http://", "https://")):
+        url = "https://" + url
+    html, err = fetch_text(url)
+    if html is None:  # 抓不到就别拿空 HTML 当"页面无结构"误报
+        print(f"无法获取页面 HTML（{err or 'HTTP 404'}）。先确认 URL 可访问再重试。")
+        return 2
+    print(render_structure(analyze_structure(html), _arg(args, "--format", "md")))
+    return 0
+
+
 def _cmd_demo(args: list) -> int:
     print(render_demo())
     return 0
@@ -249,7 +266,7 @@ def main(argv: list | None = None) -> int:
     cmd = argv[0] if argv else ""
     dispatch = {"audit": _cmd_audit, "bots": _cmd_bots, "schema": _cmd_schema,
                 "llms": _cmd_llms, "init": _cmd_init, "monitor": _cmd_monitor,
-                "offsite": _cmd_offsite, "demo": _cmd_demo}
+                "offsite": _cmd_offsite, "structure": _cmd_structure, "demo": _cmd_demo}
     if cmd in dispatch:
         return dispatch[cmd](argv[1:])
     print(_USAGE)
