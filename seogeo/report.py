@@ -34,6 +34,17 @@ _CAT_ENGINES = {
     "technical": "全引擎通用：语言 / 规范化是被正确收录的底线",
 }
 
+# 每类问题"怎么验证修好了"——确定性映射（按维度，引到真实 chinese-geo 命令，非编造）。
+_CAT_VERIFY = {
+    "domestic": "改完重跑 `chinese-geo audit` 看该项转绿；放行真伪用 `chinese-geo bots verify <ip> <bot>` 校验",
+    "overseas": "改完重跑 `chinese-geo audit` 看『海外 AI 爬虫准入』转绿",
+    "discovery": "重跑 `chinese-geo audit` 看『AI 可发现性』转绿；并在百度/搜狗资源平台确认 sitemap 已提交",
+    "structure": "重跑 `chinese-geo audit` 看『结构化』加分；用 `chinese-geo schema gen <type>` 比对字段、schema.org 校验器验合法性",
+    "content": "重跑 `chinese-geo audit` 看『内容可引用性』加分；`chinese-geo structure <url>` 看 H2 / 答案胶囊信号",
+    "rendering": "重跑 `chinese-geo audit --render` 看『JS 渲染可见性』转绿；或禁用 JS 看首屏是否仍有正文",
+    "technical": "重跑 `chinese-geo audit` 看『技术基线』转绿",
+}
+
 
 def build_recommendations(outcomes) -> list:
     recs = []
@@ -51,7 +62,8 @@ def build_recommendations(outcomes) -> list:
             prio = "Quick Win"
         recs.append({"priority": prio, "category": o.category, "points": gap,
                      "text": o.recommendation, "rule_id": o.id,
-                     "engines": _CAT_ENGINES.get(o.category, "")})
+                     "engines": _CAT_ENGINES.get(o.category, ""),
+                     "verify": _CAT_VERIFY.get(o.category, "")})
     return sorted(recs, key=lambda r: (_PRIO_ORDER[r["priority"]], -r["points"]))
 
 
@@ -109,6 +121,8 @@ def render_markdown(result: AuditResult) -> str:
             lines.append(f"- **[+{r['points']}分 · {cat_cn}]** {r['text']}")
             if r.get("engines"):
                 lines.append(f"  - 影响引擎：{r['engines']}")
+            if r.get("verify"):
+                lines.append(f"  - 验证：{r['verify']}")
         lines += [
             "",
             "> 验证闭环：改完重跑 `chinese-geo audit` 看对应项转绿；上线几周后用 "

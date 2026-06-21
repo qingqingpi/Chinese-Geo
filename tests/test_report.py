@@ -90,3 +90,29 @@ def test_markdown_shows_affected_engines_and_verify_note():
     md = render_markdown(_result())
     assert "影响引擎" in md
     assert "验证" in md and "monitor" in md  # 验证闭环引导到持续监控
+
+
+# ---- Track A：每条建议带「怎么验证」（确定性维度→验证步骤映射，非编造）----
+
+def test_recommendation_carries_verify_step():
+    recs = build_recommendations([_oc("domestic-bot-access", "domestic", "fail", 0, 20)])
+    assert recs[0]["verify"]                 # 非空
+    assert "audit" in recs[0]["verify"]      # 引导重跑 audit 复检
+
+
+def test_verify_is_category_specific():
+    dom = build_recommendations([_oc("d", "domestic", "fail", 0, 20)])[0]["verify"]
+    struct = build_recommendations([_oc("s", "structure", "fail", 0, 22)])[0]["verify"]
+    assert dom != struct                     # 不同维度给不同验证步骤，非一句通用套话
+    assert "bots verify" in dom              # domestic 专属：DNS 真伪校验
+
+
+def test_markdown_shows_per_recommendation_verify():
+    md = render_markdown(_result())          # _result() 含一条 domestic 建议
+    assert "验证：" in md                     # 每条建议下出现逐条验证步骤
+    assert "bots verify" in md               # domestic 项点名其专属校验命令（非全局脚注）
+
+
+def test_verify_in_json_recommendations():
+    data = json.loads(render_json(_result()))
+    assert data["recommendations"][0]["verify"]  # JSON 也带 verify（喂 agent/CI）
