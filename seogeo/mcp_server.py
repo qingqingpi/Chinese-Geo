@@ -37,7 +37,10 @@ def bots_gen(sitemap_url: str = "") -> str:
 @mcp.tool()
 def schema_gen(schema_type: str) -> str:
     """生成 JSON-LD 脚手架。schema_type ∈ organization / article / faqpage / breadcrumb。"""
-    return generate_schema(schema_type)
+    try:
+        return generate_schema(schema_type)
+    except ValueError as e:  # 坏 schema_type 返回可读错误串，别抛异常崩工具
+        return f"错误：{e}"
 
 
 @mcp.tool()

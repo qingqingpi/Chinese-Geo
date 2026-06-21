@@ -25,3 +25,34 @@ def test_monitor_score_good_json_still_works():
     out = mcp_server.monitor_score(answers, brand="某品牌")
     assert isinstance(out, dict)
     assert "error" not in out
+
+
+# —— D6：各工具 happy-path + 坏输入不崩 ——
+
+def test_schema_gen_happy():
+    assert "FAQPage" in mcp_server.schema_gen("faqpage")
+
+
+def test_schema_gen_bad_type_returns_error_not_crash():
+    # 坏输入不该抛 ValueError 崩掉工具，应返回可读错误串
+    out = mcp_server.schema_gen("nonsense")
+    assert isinstance(out, str)
+    assert "未知" in out
+
+
+def test_bots_gen_happy():
+    assert "user-agent" in mcp_server.bots_gen().lower()
+
+
+def test_llms_gen_happy():
+    assert "示例站" in mcp_server.llms_gen("示例站")
+
+
+def test_monitor_prompts_happy():
+    out = mcp_server.monitor_prompts("智能客服")
+    assert isinstance(out, list) and len(out) > 0
+
+
+def test_offsite_happy():
+    out = mcp_server.offsite()
+    assert isinstance(out, list) and out and "platform" in out[0]

@@ -85,7 +85,7 @@
 - [x] D3. structure 确定性背书：把"答案胶囊字数/FAQ/表格存在"下沉成 CLI 能力，structure SKILL 回调。 ✅ 完成（含 D2 意图）：新 `chinese-geo structure <url> [--format md|json]`——确定性、**非评分** advisory：DomScanner 增 `paragraph_lengths`(答案胶囊字数，中文友好非空白计数)+`heading_texts`(FAQ 问句识别)；`structure_signals.py` 出骨架(H1/H2/列表/表格)+FAQ(FAQPage JSON-LD/问句小标题)+答案胶囊字数分布(适中40–150/过长>300，注明经验范围非硬标准)。seogeo-structure SKILL 加"调 structure 拿确定性信号"步骤；AGENTS.md 补命令。`test_structure_signals.py` 7 + `test_cli.py` 4（happy/坏输入/无url，零网络注入）。**纯加法、不进评分→demo/example 分数不变**（349 测试）。
 - [ ] D4. playwright 真渲染接线：`[render]` extra 接进 rendering 规则、填 `rendered_html`，无则降级；可注入零网络测试。
 - [ ] D5. BYOK 引擎补 Gemini 原生 + 文心 Qianfan client（各零网络测试）；元宝无公开 API → 文档标注跳过。
-- [ ] D6. CLI/MCP 胶水单测继续加厚（每子命令/每工具 happy-path + 坏输入不崩）。
+- [x] D6. CLI/MCP 胶水单测继续加厚（每子命令/每工具 happy-path + 坏输入不崩）。 ✅ 完成：CLI 补 schema/bots/llms/monitor(prompts+score 经文件)/offsite happy + schema 坏类型/缺 --industry/未知命令（全零网络）；MCP 补 schema/bots/llms/monitor_prompts/offsite happy + schema_gen 坏类型。**揪出真 bug 并修**：MCP `schema_gen` 坏类型原会抛 ValueError 崩工具 → 改为返回可读错误串（对齐 monitor_score 的 error 处理）。364 测试（+15）。
 
 ---
 

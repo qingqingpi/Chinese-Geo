@@ -58,3 +58,53 @@ def test_structure_fetch_error_does_not_crash(capsys, monkeypatch):
     monkeypatch.setattr("seogeo.cli.fetch_text", lambda url: (None, "timeout"))
     assert main(["structure", "https://x.com"]) == 2
     assert "无法获取" in capsys.readouterr().out
+
+
+# —— D6：各零网络子命令 happy-path + 坏输入不崩 ——
+
+def test_schema_gen_happy(capsys):
+    assert main(["schema", "gen", "faqpage"]) == 0
+    assert "FAQPage" in capsys.readouterr().out
+
+
+def test_schema_gen_bad_type_exits_2(capsys):
+    assert main(["schema", "gen", "nonsense"]) == 2
+    assert "未知" in capsys.readouterr().out
+
+
+def test_bots_gen_happy(capsys):
+    assert main(["bots", "gen"]) == 0
+    assert "user-agent" in capsys.readouterr().out.lower()
+
+
+def test_llms_gen_happy(capsys):
+    assert main(["llms", "gen", "--title", "示例站"]) == 0
+    assert "示例站" in capsys.readouterr().out
+
+
+def test_monitor_prompts_happy(capsys):
+    assert main(["monitor", "prompts", "--industry", "智能客服"]) == 0
+    assert "智能客服" in capsys.readouterr().out
+
+
+def test_monitor_prompts_missing_industry_exits_2(capsys):
+    assert main(["monitor", "prompts"]) == 2
+    assert "industry" in capsys.readouterr().out.lower()
+
+
+def test_monitor_score_via_file(tmp_path, capsys):
+    import json
+    f = tmp_path / "answers.json"
+    f.write_text(json.dumps({"豆包": ["某品牌不错"]}), encoding="utf-8")
+    assert main(["monitor", "score", "--answers", str(f), "--brand", "某品牌"]) == 0
+    assert "引用" in capsys.readouterr().out
+
+
+def test_offsite_happy(capsys):
+    assert main(["offsite"]) == 0
+    assert "平台" in capsys.readouterr().out
+
+
+def test_unknown_command_prints_usage(capsys):
+    assert main(["frobnicate"]) == 2
+    assert "用法" in capsys.readouterr().out
