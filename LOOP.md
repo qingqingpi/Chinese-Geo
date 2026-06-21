@@ -4,7 +4,7 @@
 > 配套读 `AGENTS.md`（项目是什么、CLI/Skill 清单、开发约定）。本文件只管"重心、怎么循环、做什么、不许做什么"。
 > **命令名＝`chinese-geo`**（2026-06-20 改名，内部 Python 模块仍 `seogeo`，`python -m seogeo.cli ...` 不变）。
 
-> ⏸️ **暂停待 review（必修 A/B/C 全完，2026-06-21）** —— Track A + B + C 已全部 `[x]`，必修闭环完成、333 测试全绿、本地提交未 push。**loop 在此停**：交回用户 review，不发版（发版＝人按一键按钮）。**别自动进 Track D**（选做 / 低优）。若有遗留计时器误触发本 loop：A/B/C 已无 `[ ]` → 直接停、输出 Track C 小结、等用户明确放行（如"续 Track D"）再动。
+> ▶️ **Track D 进行中（用户 2026-06-21 明确"继续D"已授权）** —— 必修 A/B/C 全 `[x]`、已交 review。现按用户指令做 Track D（选做增强）+ 收尾后做一次代码审查。loop 改为**用户手动驱动**（不自动 ScheduleWakeup）；若遗留计时器误触发：按 BACKLOG 顶部第一个 `[ ]` 正常推进即可。仍不 push、不发版（发版＝人按一键按钮）。
 
 ---
 
@@ -80,7 +80,7 @@
 - [x] C3. **文档同步过一遍**：INSTALL/AGENTS/README 与 A/B 的新能力对齐。 ✅ 完成：核对发现三份文档的 init --agent 11-agent 清单已与 `generate.py _AGENTS` 一致、无过时裸 `seogeo <子命令>`（命令名统一 chinese-geo）；唯一真缺口＝INSTALL.md 没提 `chinese-geo demo`（B1 自证）和 `examples/`（C1），已在「第 1 步」补上（装完先跑 demo 自证 + 指向 examples/，不硬编码分数避免无测试的漂移点）。新增 `test_docs_sync.py` 3 项 anti-drift（清单=代码、无过时命令名、INSTALL 覆盖 demo+examples），漏一个就变红。333 测试。
 
 ### Track D —— 收尾增强（选做 / 低优；必修＝A/B/C，C 清完即"必修完成"，D 视情况做或留人，别耗）
-- [ ] D1. audit 加规则：图片 alt 缺失检查（`rules/img_alt.py` + 测试）。
+- [x] D1. audit 加规则：图片 alt 缺失检查（`rules/img_alt.py` + 测试）。 ✅ 完成：DomScanner 增 `images`/`images_missing_alt`（`alt` 属性缺失才算，`alt=""` 是装饰性合法用法不误伤）；`rules/img_alt.py`（technical 类，weight 6）——无图/全有 alt=pass、有缺=warn 报数量。`test_img_alt.py` 6 项。**注：新增评分规则使归一化基线微移**——demo before 33→**36**、bad-site 52→**54**（无图站 img-alt 满分属实，honest）；已更新 README 静态数字 36；`test_demo`/`test_examples` 用相对/阈值断言不受影响，`test_readme_quickstart` 动态读 `run_demo()` 自适应。339 测试。
 - [ ] D2. audit 加规则：答案胶囊字数软提示（只 warn、注明"经验范围非硬标准"）。
 - [ ] D3. structure 确定性背书：把"答案胶囊字数/FAQ/表格存在"下沉成 CLI 能力，structure SKILL 回调。
 - [ ] D4. playwright 真渲染接线：`[render]` extra 接进 rendering 规则、填 `rendered_html`，无则降级；可注入零网络测试。

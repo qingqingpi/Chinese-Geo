@@ -19,6 +19,8 @@ class DomScanner(HTMLParser):
         self.links: list = []
         self.has_list = False
         self.has_table = False
+        self.images = 0
+        self.images_missing_alt = 0  # <img> 无 alt 属性（alt="" 是装饰性合法用法，不计入）
         self._in_title = False
         self._in_jsonld = False
         self._jsonld_buf: list = []
@@ -45,6 +47,10 @@ class DomScanner(HTMLParser):
             self.has_list = True
         if tag == "table":
             self.has_table = True
+        if tag == "img":
+            self.images += 1
+            if "alt" not in a:
+                self.images_missing_alt += 1
         if tag in ("script", "style"):
             self._in_skip = True
         if tag == "script" and a.get("type", "").lower() == "application/ld+json":

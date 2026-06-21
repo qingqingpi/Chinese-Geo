@@ -9,6 +9,7 @@ from seogeo.rules import (  # noqa: F401  （触发自注册）
     domestic_bots,
     freshness,
     https,
+    img_alt,
     opengraph,
     overseas_bots,
     rendering,

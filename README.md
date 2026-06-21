@@ -34,7 +34,7 @@ pip install -e .
 chinese-geo demo                               # ← 先跑这条
 ```
 
-`chinese-geo demo` 零 key、零网络，当场把一个内置差站从 **33/100 修到 100/100**（用工具自己的生成器补 H1 / JSON-LD / OG / 正文 + 放行国内爬虫，体检 → 修复 → 复检 全跑一遍）——这就是最小自证。没装也能跑：`python -m seogeo.cli demo`。
+`chinese-geo demo` 零 key、零网络，当场把一个内置差站从 **36/100 修到 100/100**（用工具自己的生成器补 H1 / JSON-LD / OG / 正文 + 放行国内爬虫，体检 → 修复 → 复检 全跑一遍）——这就是最小自证。没装也能跑：`python -m seogeo.cli demo`。
 
 **接着体检你自己的站**，生成 robots / schema、监控引用率：
 
