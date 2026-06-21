@@ -41,3 +41,34 @@ def test_dom_none_no_html_error_warns_not_fails():
     ctx = AuditContext(url="https://x.com", dom=None, html_error=None)
     out = check_content_structure(ctx)
     assert out.status == "warn", f"期望 warn，实际 {out.status}"
+
+
+# ── FAQPage 算"可抽取分节"内容信号（H2 或 FAQPage 都满足分节） ──
+
+_FAQ_LD = (
+    '<script type="application/ld+json">'
+    '{"@context":"https://schema.org","@type":"FAQPage","mainEntity":'
+    '[{"@type":"Question","name":"孙鑫是谁?","acceptedAnswer":{"@type":"Answer","text":"AI Agent 产品经理。"}}]}'
+    '</script>'
+)
+
+
+def test_faqpage_counts_as_sections_signal_can_pass():
+    # H1 + FAQPage(无 H2) + 足量正文 + 列表 → 4/4（FAQ 顶替 H2 的"分节"信号）→ pass
+    html = "<h1>标题</h1>" + _FAQ_LD + "<p>" + "内容" * 200 + "</p><ul><li>项</li></ul>"
+    assert check_content_structure(_ctx(html)).status == "pass"
+
+
+def test_faqpage_hero_not_nagged_to_add_h2():
+    # 典型 hero：H1 + FAQPage + 列表，正文偏短、无 H2 → warn，但有 FAQPage 就不该再硬要 H2
+    html = "<h1>孙鑫</h1>" + _FAQ_LD + "<ul><li>Agent</li></ul><p>一句话简介</p>"
+    out = check_content_structure(_ctx(html))
+    assert "H2" not in out.recommendation
+
+
+def test_no_faq_no_h2_still_flags_sections():
+    # 回归：既无 H2 又无 FAQPage → 仍提示补"分节"（H2 或 FAQPage）
+    html = "<h1>标题</h1><p>" + "内容" * 200 + "</p><ul><li>项</li></ul>"
+    out = check_content_structure(_ctx(html))
+    assert out.status == "warn"
+    assert "H2" in out.recommendation or "FAQ" in out.recommendation
