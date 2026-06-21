@@ -117,6 +117,18 @@ def test_available_engines_includes_gemini_and_ernie():
     assert "gemini" in avail and "ernie" in avail
 
 
+def test_gemini_blocked_empty_candidates_no_crash():
+    # Gemini 安全过滤 → candidates:[]，不该崩，返回空答案（计为未提及）
+    http = lambda url, headers, payload: {"candidates": []}
+    assert ask("gemini", "q", api_key="k", http=http) == ""
+
+
+def test_gemini_candidate_without_content_no_crash():
+    # finishReason=SAFETY 的候选无 content 键 → 不该 KeyError
+    http = lambda url, headers, payload: {"candidates": [{"finishReason": "SAFETY"}]}
+    assert ask("gemini", "q", api_key="k", http=http) == ""
+
+
 def test_run_matrix_mixes_protocols():
     # 同一矩阵里 gemini（原生）与 deepseek（兼容）都能跑，回答正确归位
     def http(url, headers, payload):

@@ -71,7 +71,11 @@ def ask(engine_name: str, prompt: str, *, api_key: str | None = None,
         payload = {"contents": [{"parts": [{"text": prompt}]}],
                    "generationConfig": {"temperature": 0.3}}
         resp = http(url, {"Content-Type": "application/json"}, payload)
-        return resp["candidates"][0]["content"]["parts"][0]["text"]
+        # 安全过滤 / 空响应时 candidates 可能为 []，或候选无 content（finishReason=SAFETY）：
+        # 降级成空答案（计为未提及），别让一条被拦的 prompt 抛异常炸掉整个矩阵。
+        cands = resp.get("candidates") or []
+        parts = ((cands[0].get("content") or {}).get("parts") if cands else None) or []
+        return parts[0].get("text", "") if parts else ""
 
     # OpenAI 兼容 /chat/completions
     url = eng.base_url.rstrip("/") + "/chat/completions"
