@@ -21,17 +21,24 @@ class Engine:
     model: str       # 默认模型；可用环境变量 {NAME}_MODEL 覆盖
     key_env: str
     web_grounded: bool = False
+    protocol: str = "openai"  # "openai"=/chat/completions Bearer；"gemini"=generateContent + query key
 
 
 ENGINES = {e.name: e for e in [
     # 海外
     Engine("perplexity", "https://api.perplexity.ai", "sonar", "PERPLEXITY_API_KEY", web_grounded=True),
     Engine("openai", "https://api.openai.com/v1", "gpt-4o-mini", "OPENAI_API_KEY"),
-    # 国内（均为 OpenAI 兼容端点）
+    Engine("gemini", "https://generativelanguage.googleapis.com/v1beta", "gemini-1.5-flash",
+           "GEMINI_API_KEY", protocol="gemini"),  # 原生 generateContent（非 OpenAI 兼容）
+    # 国内
     Engine("deepseek", "https://api.deepseek.com/v1", "deepseek-chat", "DEEPSEEK_API_KEY"),
     Engine("qwen", "https://dashscope.aliyuncs.com/compatible-mode/v1", "qwen-plus", "DASHSCOPE_API_KEY"),
     Engine("doubao", "https://ark.cn-beijing.volces.com/api/v3", "doubao-pro-32k", "ARK_API_KEY"),
     Engine("moonshot", "https://api.moonshot.cn/v1", "moonshot-v1-8k", "MOONSHOT_API_KEY"),
+    # 文心一言：百度千帆 v2 的 OpenAI 兼容端点；BYOK 用户提供 v2 应用 API key（QIANFAN_API_KEY）。
+    # 注：千帆鉴权随版本演进，若你的应用走旧版 access_token，请按需在此调整 base_url / 鉴权。
+    Engine("ernie", "https://qianfan.baidubce.com/v2", "ernie-4.0-8k", "QIANFAN_API_KEY"),
+    # 元宝（腾讯）：无公开 API → 不接入，监控用消费版手动粘贴（monitor prompts + score）。
 ]}
 
 
@@ -50,20 +57,26 @@ def available_engines(env=None) -> list:
 
 def ask(engine_name: str, prompt: str, *, api_key: str | None = None,
         model: str | None = None, http=None, env=None) -> str:
-    """问单个引擎一个 prompt，返回回答文本（OpenAI 兼容 /chat/completions）。"""
+    """问单个引擎一个 prompt，返回回答文本。支持 OpenAI 兼容与 Gemini 原生两种协议。"""
     env = os.environ if env is None else env
     eng = ENGINES[engine_name]
     key = api_key or env.get(eng.key_env)
     if not key:
         raise RuntimeError(f"{engine_name} 缺少 API key —— 请设置环境变量 {eng.key_env}")
     http = http or _http_post
+    model = model or env.get(f"{engine_name.upper()}_MODEL") or eng.model
+
+    if eng.protocol == "gemini":  # 原生 generateContent：query key（非 Bearer）、contents/parts 形状
+        url = f"{eng.base_url.rstrip('/')}/models/{model}:generateContent?key={key}"
+        payload = {"contents": [{"parts": [{"text": prompt}]}],
+                   "generationConfig": {"temperature": 0.3}}
+        resp = http(url, {"Content-Type": "application/json"}, payload)
+        return resp["candidates"][0]["content"]["parts"][0]["text"]
+
+    # OpenAI 兼容 /chat/completions
     url = eng.base_url.rstrip("/") + "/chat/completions"
     headers = {"Authorization": f"Bearer {key}", "Content-Type": "application/json"}
-    payload = {
-        "model": model or env.get(f"{engine_name.upper()}_MODEL") or eng.model,
-        "messages": [{"role": "user", "content": prompt}],
-        "temperature": 0.3,
-    }
+    payload = {"model": model, "messages": [{"role": "user", "content": prompt}], "temperature": 0.3}
     resp = http(url, headers, payload)
     return resp["choices"][0]["message"]["content"]
 

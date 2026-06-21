@@ -194,7 +194,8 @@ def _cmd_monitor(args: list) -> int:
         avail = available_engines()
         if not avail:
             print("没有可用引擎：先设置至少一个 API key 环境变量，例如 DEEPSEEK_API_KEY / "
-                  "OPENAI_API_KEY / PERPLEXITY_API_KEY / DASHSCOPE_API_KEY / ARK_API_KEY / MOONSHOT_API_KEY。")
+                  "OPENAI_API_KEY / PERPLEXITY_API_KEY / GEMINI_API_KEY / DASHSCOPE_API_KEY / "
+                  "ARK_API_KEY / MOONSHOT_API_KEY / QIANFAN_API_KEY。")
             return 2
         only = _csv(args, "--engines") or None
         used = [e for e in (only or avail) if e in avail]
